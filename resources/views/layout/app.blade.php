@@ -285,7 +285,7 @@
     }
     </script> --}}
 
-    <script type="text/javascript">
+    {{-- <script type="text/javascript">
         if ($('.audio-player').length) {
             const localStorageKeys = {
                 volume: 'audio_player_volume',
@@ -425,18 +425,22 @@
                 return (angle < 0) ? angle + 360 : angle;
             }
         }
-    </script>
+    </script> --}}
 
-    {{-- <script type="text/javascript">
+    <script type="text/javascript">
         $(document).ready(function () {
             if ($('.audio-player').length) {
                 const localStorageKeys = {
                     volume: 'audio_player_volume',
                     currentTrack: 'audio_player_current_track',
                     currentTime: 'audio_player_current_time',
+                    playlist:'audio_player_playlist'
                 };
 
-                var playlistData = [
+                const savedPlaylist = localStorage.getItem(localStorageKeys.playlist);
+
+
+                var playlistData = savedPlaylist ? JSON.parse(savedPlaylist) : [
                     {
                         image: '{{ asset('usx_files/covers/cover-default.jpg') }}',
                         title: "Bienvenue",
@@ -477,6 +481,10 @@
                         mp3: mp3,
                         poster: cover
                     });
+
+                    // Sauvegarde  la playlist pour  permettre  la restoration
+                    const currentPlaylist = JSON.stringify(myPlaylist.playlist)
+                    localStorage.setItem(localStorageKeys.playlist, currentPlaylist);
 
                     const newTrackIndex = myPlaylist.playlist.length - 1;
                     myPlaylist.play(newTrackIndex);
@@ -536,15 +544,7 @@
                 });
             }
         });
-    </script> --}}
-
-
-
-
-
-
-
-
+    </script>
 
 	@hasSection ('js')
 		@yield('js')
