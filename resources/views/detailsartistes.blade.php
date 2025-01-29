@@ -156,10 +156,6 @@
                                 <div class="bt-1 border-color-1"></div>
                             </div>
                             <div class="row">
-                                {{-- @php
-                                    $i = 1;
-                                @endphp --}}
-
                                 @php $i = 1; @endphp
 
                                 @forelse ($singles as $single)
@@ -202,32 +198,6 @@
                             @empty
                                 <p class="text-center">Aucun Single disponible</p>
                             @endforelse --}}
-
-                                {{-- @forelse ($singles as $single)
-                                    <div class="col-md-6 col-sm-6 sm-grid-content mb-30">
-                                        <div class="post-thumb d-flex mb-15">
-                                            <a href="javascript:void(0);" class="play-single"
-                                                data-title="{{ $single->titre }}"
-                                                data-artist="{{ $single->User->nomartiste }}"
-                                                data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
-                                                data-cover="{{ asset('usx_files/covers/' . $single->cover) }}">
-                                                <img src="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                    alt="{{ $single->titre }}" class="img-fluid">
-                                            </a>
-                                        </div>
-                                        <h6 class="post-title pr-5 pl-5 mb-10 mt-15 text-limit-2-row">
-                                            <a href="javascript:void(0);" class="play-single"
-                                                data-title="{{ $single->titre }}"
-                                                data-artist="{{ $single->User->nomartiste }}"
-                                                data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
-                                                data-cover="{{ asset('usx_files/covers/' . $single->cover) }}">
-                                                {{ $single->titre }}
-                                            </a>
-                                        </h6>
-                                    </div>
-                                @empty
-                                    <p class="text-center">Aucun single disponible</p>
-                                @endforelse --}}
                             </div>
                         </div>
                     </div>
