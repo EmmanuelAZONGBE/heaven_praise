@@ -31,8 +31,8 @@
                                 <span class="top-right-icon background8"><i class="mdi mdi-flash-on"></i></span>
                             @endif
                             <a class='img-link' href='{{route('detailsevenements',['slug'=>$listlastevent->slug])}}'></a>
-                            
-                                
+
+
                                 <div class="post-content-overlay ml-30 mr-30">
                                     <div class="entry-meta meta-0 font-small mb-20">
                                         <a href='#'><span class="post-cat background8 color-white">Évènement</span></a>
@@ -47,11 +47,11 @@
                                 </div>
                         </div>
                     </div>
-            
+
                 @empty
                 @endforelse
             @endif
-            
+
             @php
                 $s=1;
             @endphp
@@ -109,7 +109,7 @@
                                             <li><a class='font-medium' href='{{route('detailsactualites',['slug'=>$flashactu->slug])}}'>{{$flashactu->titre}}</a></li>
                                         @empty
                                         @endforelse
-                                        
+
                                     </ul>
                                 </div>
                             </div>
@@ -144,7 +144,7 @@
                             </div>
                         </div>
                     @empty
-                        
+
                     @endforelse
                     <div class="col-12">
                         <div class="mt-30 bt-1 border-color-1"></div>
@@ -181,7 +181,7 @@
                             </div>
                         </div>
                     @empty
-                        
+
                     @endforelse
                 </div>
             </div>
@@ -219,12 +219,12 @@
                                 </div>
                             </div>
                             <div class="block-tab-item post-module-1 post-module-4 mt-50">
-                                
+
                                 <div class="row">
                                     <div class="col-lg-5 col-md-6">
                                         <div class="post-thumb position-relative">
                                             <div class="thumb-overlay img-hover-slide border-radius-5 position-relative" style="background-image: url({{asset('PlayerTemplate/img/live/'.$firstlive->banniere)}})">
-                                                
+
                                                 <a class='img-link' href='#'></a>
                                                 <div class="post-content-overlay">
                                                     @if ($firstlive->encours ==1)
@@ -256,7 +256,7 @@
                                             @endphp
                                             @forelse ($otherlives as $live)
                                                 @php
-                                                    
+
                                                     $explode=explode('?',$live->lien);
                                                     $id=$explode[1];
                                                     $video_ID = $id;
@@ -266,7 +266,7 @@
                                                 @endphp
                                                 <div class="slider-single col-lg-4 col-md-6 mb-30 {{(($i==5)) ? "d-none d-lg-block" : ""}}">
                                                     <div class="img-hover-scale border-radius-5">
-                                                        
+
                                                         <a href='#'>
                                                             <img class="border-radius-5" src="{{asset('PlayerTemplate/img/live/'.$live->banniere)}}" alt="post-slider">
                                                         </a>
@@ -289,7 +289,7 @@
                                                     $i=$i+1;
                                                 @endphp
                                             @empty
-                                                
+
                                             @endforelse
                                         </div>
                                     </div>
@@ -300,7 +300,7 @@
                 </div>
             </div>
         </div>
-    @endif  
+    @endif
 
     <!-- End Start youtube -->
     <!--  Recent Articles start -->
@@ -340,7 +340,7 @@
                                         </div>
                                     </div>
                                 @empty
-                                    
+
                                 @endforelse
                             </div>
                         </div>
@@ -387,12 +387,12 @@
                                     </div>
                                 </div>
                             </article>
-                            
+
                         @empty
-                            
+
                         @endforelse
                     </div>
-                    
+
                 </div>
                 <div class="col-lg-4 col-md-12">
                     <div class="widget-area">
@@ -454,9 +454,9 @@
                                                 $i=$i+1;
                                             @endphp
                                         @empty
-                                            
+
                                         @endforelse
-                                        
+
                                     </div>
                                 </nav>
                                 <div class="tab-content">

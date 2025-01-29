@@ -119,16 +119,16 @@
                                         </div>
                                     </article>
                                 @empty
-                                    
+
                                 @endforelse
                             </div>
                         </div>
-                        
+
                     @endif
                     <!--Comments-->
                     <div class="comments-area">
                         <h3 class="mb-30">{{$comments->count()}}  {{($count>1) ? "Commentaires" : "Commentaire"}}</h3>
-                        
+
                         @forelse ($comments as $comment)
                             <div class="comment-list">
                                 <div class="single-comment justify-content-between d-flex">
@@ -153,7 +153,7 @@
                                 </div>
                             </div>
                         @empty
-                            
+
                         @endforelse
 
                     </div>
@@ -217,9 +217,9 @@
                                             </div>
                                         </div>
                                     @empty
-                                        
+
                                     @endforelse
-                                    
+
                                     {{-- <div class="form-group">
                                         <input type="text" class="form-control" placeholder="Votre Nom & Prénoms">
                                     </div>
@@ -234,7 +234,7 @@
                                     </div> --}}
                                     <button class="btn btn-fill-out" type="submit">Commander</button>
                                 </form>
-                            </div>  
+                            </div>
                         @endif
 
                         <!--Widget social-->
@@ -313,7 +313,7 @@
                                     $categories=App\Models\Categorie::get();
                                     $cat=2;
                                 @endphp
-                                <ul> 
+                                <ul>
                                     @forelse ($categories as $categorie)
                                         @php
                                             $count=App\Models\Actualite::where('publie',1)->where('categorie_id',$categorie->id)->count();
@@ -323,7 +323,7 @@
                                             $cat=$cat+1;
                                         @endphp
                                     @empty
-                                        
+
                                     @endforelse
                                 </ul>
                             </div>
@@ -357,11 +357,11 @@
                                             </div>
                                         </article>
                                     @empty
-                                        
+
                                     @endforelse
                                 </div>
                             </div>
-                            
+
                         @endif
                     </div>
                 </div>

@@ -78,7 +78,8 @@
                                                                 href="{{ route('detailsalbums', ['slug' => $album->slug]) }}">{{ $album->titre }}</a>
                                                         </h6>
                                                         <div class="img-hover-scale border-radius-5 hover-box-shadow">
-                                                            <a href="{{ route('detailsalbums', ['slug' => $album->slug]) }}"><img
+                                                            <a
+                                                                href="{{ route('detailsalbums', ['slug' => $album->slug]) }}"><img
                                                                     class="border-radius-5"
                                                                     src="{{ asset('usx_files/covers/' . $album->cover) }}"
                                                                     alt="post-slider"></a>
@@ -155,9 +156,33 @@
                                 <div class="bt-1 border-color-1"></div>
                             </div>
                             <div class="row">
-                                @php
+                                {{-- @php
                                     $i = 1;
-                                @endphp
+                                @endphp --}}
+
+                                @php $i = 1; @endphp
+
+                                @forelse ($singles as $single)
+                                    <div class="col-md-6 col-sm-6 sm-grid-content mb-30">
+                                        <div class="post-thumb d-flex border-radius-5 img-hover-scale mb-15">
+                                            <a href="javascript:;" class="jp-playlist-item play-single"
+                                                data-index="{{ $loop->index }}">
+                                                <span class="que_img"><img
+                                                        src="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                        class="mCS_img_loaded"></span>
+                                            </a>
+                                        </div>
+                                        <div class="post-content media-body">
+                                            <h6 class="post-title mb-10 text-limit-2-row">{{ $i }}.
+                                                {{ $single->titre }}</h6>
+                                        </div>
+                                    </div>
+
+                                    @php $i++; @endphp
+                                @empty
+                                    <p class="text-center">Aucun Single disponible</p>
+                                @endforelse
+
                                 {{-- @forelse ($singles as $single)
                                 <div class="col-md-6 col-sm-6 sm-grid-content mb-30">
                                     <div class="post-thumb d-flex border-radius-5 img-hover-scale mb-15">
@@ -178,7 +203,7 @@
                                 <p class="text-center">Aucun Single disponible</p>
                             @endforelse --}}
 
-                                @forelse ($singles as $single)
+                                {{-- @forelse ($singles as $single)
                                     <div class="col-md-6 col-sm-6 sm-grid-content mb-30">
                                         <div class="post-thumb d-flex mb-15">
                                             <a href="javascript:void(0);" class="play-single"
@@ -202,7 +227,7 @@
                                     </div>
                                 @empty
                                     <p class="text-center">Aucun single disponible</p>
-                                @endforelse
+                                @endforelse --}}
                             </div>
                         </div>
                     </div>
