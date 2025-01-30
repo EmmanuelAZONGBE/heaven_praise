@@ -84,7 +84,6 @@
                                             <p>Aucun single disponible.</p>
                                         @endforelse
                                     </ul>
-
                                 </div>
                             </div>
                         </div>

@@ -20,20 +20,14 @@
                     </div>
                     <div class="play_song_options">
                         <ul>
-                            {{-- <li>
-								<a href="#">
-									<span class="song_optn_icon"><i class="ms_icon icon_fav"></i></span>
-									Ajouter aux favoris
-								</a>
-							</li> --}}
                             <li>
-                                <a href="#" class="add-to-playlist">
+                                <a href="javascript:;" class="add-to-playlist">
                                     <span class="song_optn_icon"><i class="ms_icon icon_playlist"></i></span>
                                     Ajouter à la playlist
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
+                                <a href="javascript:;" class="share-song">
                                     <span class="song_optn_icon"><i class="ms_icon icon_share"></i></span>
                                     Partager
                                 </a>
@@ -44,8 +38,7 @@
                 </div>
                 <!----Right Queue---->
                 <div class="jp_queue_wrapper">
-                    <span class="que_text" id="myPlaylistQueue"><i class="fa fa-angle-up" aria-hidden="true"></i>
-                        playlist</span>
+                    <span class="que_text" id="myPlaylistQueue"><i class="fa fa-angle-up" aria-hidden="true"></i> playlist</span>
                     <div id="playlist-wrap" class="jp-playlist">
                         <div class="jp_queue_cls">
                             <i class="fa fa-times" aria-hidden="true"></i>
@@ -93,19 +86,13 @@
                                             </div>
                                             <div class="handle"></div>
                                             <div class="round">
-                                                <img src="{{ asset('PlayerTemplate/images/svg/volume.svg') }}"
-                                                    alt="">
+                                                <img src="{{ asset('PlayerTemplate/images/svg/volume.svg') }}" alt="">
                                             </div>
                                         </div>
                                     </div>
-                                    <!--
-         <input>
-         </input>
-         -->
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
