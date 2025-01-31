@@ -38,7 +38,8 @@
                 </div>
                 <!----Right Queue---->
                 <div class="jp_queue_wrapper">
-                    <span class="que_text" id="myPlaylistQueue"><i class="fa fa-angle-up" aria-hidden="true"></i> playlist</span>
+                    <span class="que_text" id="myPlaylistQueue"><i class="fa fa-angle-up" aria-hidden="true"></i>
+                        playlist</span>
                     <div id="playlist-wrap" class="jp-playlist">
                         <div class="jp_queue_cls">
                             <i class="fa fa-times" aria-hidden="true"></i>
@@ -69,9 +70,10 @@
                                 <span class="jp-duration" role="timer" aria-label="duration">&nbsp;</span>
                             </div>
                             <div class="jp-progress">
-                                <div class="jp-seek-bar">
-                                    <div class="jp-play-bar">
-                                        <div class="bullet"></div>
+                                <div class="jp-seek-bar" style="width: 100%;">
+                                    <div class="jp-play-bar" style="width: 1.79091%;">
+                                        <div class="bullet">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -86,7 +88,8 @@
                                             </div>
                                             <div class="handle"></div>
                                             <div class="round">
-                                                <img src="{{ asset('PlayerTemplate/images/svg/volume.svg') }}" alt="">
+                                                <img src="{{ asset('PlayerTemplate/images/svg/volume.svg') }}"
+                                                    alt="">
                                             </div>
                                         </div>
                                     </div>

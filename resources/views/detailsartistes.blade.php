@@ -160,11 +160,11 @@
                                 @forelse ($singles as $single)
                                     <div class="col-md-6 col-sm-6 sm-grid-content mb-30">
                                         <div class="post-thumb d-flex border-radius-5 img-hover-scale mb-15">
-                                            <a href="javascript:;" class="jp-playlist-item play-single"
-                                               data-title="{{$i}}. {{$single->titre}}"
-                                               data-artist="{{$single->User->nomartiste}}"
-                                               data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                               data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
+                                            <a href="javascript:;" class="jp-playlist-item"
+                                                data-title="{{ $i }}. {{ $single->titre }}"
+                                                data-artist="{{ $single->User->nomartiste }}"
+                                                data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
                                                 <span class="que_img"><img
                                                         src="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                         class="mCS_img_loaded"></span>
@@ -173,6 +173,32 @@
                                         <div class="post-content media-body">
                                             <h6 class="post-title mb-10 text-limit-2-row">{{ $i }}.
                                                 {{ $single->titre }}</h6>
+                                            <!-- Plus Icon and Menu -->
+                                            <div class="ms_more_icon">
+                                                <span class="plus-icon">+</span>
+                                            </div>
+                                            <ul class="more_option">
+                                                <li>
+                                                    <a href="javascript:;" class="add"
+                                                        data-title="{{ $i }}. {{ $single->titre }}"
+                                                        data-artist="{{ $single->User->nomartiste }}"
+                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                        data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
+                                                        <span class="opt_icon"><i
+                                                                class="ms_icon icon_playlist"></i></span>
+                                                        Ajouter à la playlist
+                                                    </a>
+                                                </li>
+                                                <li><a href="javascript:;" class="play-song"
+                                                        data-title="{{ $i }}. {{ $single->titre }}"
+                                                        data-artist="{{ $single->User->nomartiste }}"
+                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                        data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
+                                                        <span class="opt_icon"><span
+                                                                class="icon icon_share"></span></span>
+                                                        Jouer
+                                                    </a></li>
+                                            </ul>
                                         </div>
                                     </div>
                                     @php $i++; @endphp
@@ -188,3 +214,20 @@
         </div>
     </main>
 @endsection
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $(".ms_more_icon").on("click", function() {
+            var $menu = $(this).next(".more_option");
+            $(".more_option").not($menu).slideUp(); // Cache les autres menus ouverts
+            $menu.slideToggle(); // Affiche ou cache le menu actuel
+        });
+
+        // Fermer le menu si on clique ailleurs sur la page
+        $(document).on("click", function(e) {
+            if (!$(e.target).closest(".ms_more_icon, .more_option").length) {
+                $(".more_option").slideUp();
+            }
+        });
+    });
+</script>

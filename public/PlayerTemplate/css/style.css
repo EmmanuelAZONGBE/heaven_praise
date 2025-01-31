@@ -1,13 +1,13 @@
-/*--------------------- Copyright (c) 2018 ----------------------- 
-[Master Stylesheet] 
-Project: Miraculous - Online Music Store Html Template 
-Version: 1.0.0 
+/*--------------------- Copyright (c) 2018 -----------------------
+[Master Stylesheet]
+Project: Miraculous - Online Music Store Html Template
+Version: 1.0.0
 Author: Kamleshyadav
- ------------------------------------------------------------------- 
-[Table of contents] 
-1. Body 
-2. Normal Css 
-3. Loader Css 
+ -------------------------------------------------------------------
+[Table of contents]
+1. Body
+2. Normal Css
+3. Loader Css
 4. Nav Css / .ms_sidemenu_wrapper
 5. Header Css / .ms_header
 6. Banner Css / .ms-banner
@@ -28,17 +28,59 @@ Author: Kamleshyadav
 21.Purchase Page Css / .ms_free_download.ms_purchase_wrapper
 22.History Page Css / .ms_top_artist
 23.AddToPlaylist Page Css / .ms_top_artist
-24.Modal Css Start 
+24.Modal Css Start
 25.Edit Profile Page Css / .ms_profile_wrapper
-26.Plans Css / .ms_account_wrapper 
+26.Plans Css / .ms_account_wrapper
 27.Upload Page Css / .ms_upload_wrapper
-28.Language Popup Css 
+28.Language Popup Css
 29.Blog Page Css / .ms_blog_wrapper
 30.Blog Single Page Css / .ms_blog_single_wrapper
 31.Sidebar Css / .ms_sidebar
 -------------------------------------------------------------------*/
 
 /*====Player Css Start====*/
+/* Plus Icon Styling */
+.ms_more_icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Menu des options */
+ul.more_option {
+    display: none; /* Cacher le menu par défaut */
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    width: 180px;
+    list-style: none;
+    padding: 10px 0;
+    text-align: left;
+    border-radius: 10px;
+    z-index: 10;
+}
+
+/* Options de menu */
+ul.more_option li {
+    padding: 8px 16px;
+}
+
+ul.more_option li a {
+    text-decoration: none;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.opt_icon {
+    margin-right: 10px;
+}
+
 .ms_player_wrapper {
 	background-image: url(../images/player_bg.jpg);
 	background-size: cover;
@@ -2402,7 +2444,7 @@ ul.play_active_song .play_hover {
 	}
 	.ms_album_single_wrapper .album_list_wrapper {
 		width: 120%;
-	
+
 	}
 }
 @media(min-width:768px) and (max-width:991px) {
@@ -2898,7 +2940,7 @@ ul.play_active_song .play_hover {
 	.ms_main_wrapper.ms_profile .ms_top_search {
 		top: 0px;
 	}
-	
+
 	.ms_profile .ms_top_btn .ms_btn {
 		top: -3px;
 	}
