@@ -304,6 +304,7 @@
                 title: "Bienvenue",
                 artist: "Heavenly Praise",
                 mp3: "https://heavenly-praise.com/usx_files/songs/welcome-heavenly-praise.mp3",
+                option:"",
             }
         ];
 
@@ -451,7 +452,11 @@
              $('.add-to-playlist').on('click', function() {
                 if (currentSong.mp3) {
                     const isDuplicate = myPlaylist.playlist.some(track => track.mp3 === currentSong.mp3);
+
+                    console.log('log song', currentSong);
                     if (!isDuplicate) {
+                        currentSong.image = currentSong.img;
+                        currentSong.option = "";
                         myPlaylist.add(currentSong);
                         $('.playlist-items').append('<li class="playlist-item" data-title="' + currentSong.title + '" data-artist="' + currentSong.artist + '" data-img="' + currentSong.img + '" data-mp3="' + currentSong.mp3 + '">' + currentSong.title + ' - ' + currentSong.artist + '</li>');
                         savePlaylistToStorage();
@@ -482,8 +487,11 @@
                             title: title,
                             artist: artist,
                             mp3: mp3,
-                            img: img
+                            image:img,
+                            option: ""
                         };
+
+                        console.log("song", song);
 
                         myPlaylist.add(song);
                         $('.playlist-items').append('<li class="playlist-item" data-title="' + title + '" data-artist="' + artist + '" data-img="' + img + '" data-mp3="' + mp3 + '">' + title + ' - ' + artist + '</li>');
@@ -506,6 +514,7 @@
                 var artist = $(this).data('artist');
                 var img = $(this).data('img');
                 var mp3 = $(this).data('mp3');
+                console.log(" current  song is  playing");
 
                 if (title && artist && img && mp3) {
                     $("#jquery_jplayer_1").jPlayer("setMedia", { mp3, oga: mp3.replace('.mp3', '.ogg') }).jPlayer("play");
@@ -531,11 +540,21 @@
 
             // Sauvegarde manuelle de la playlist
             $('#save-playlist').on('click', savePlaylistToStorage);
+
+            $("#jquery_jplayer_1").on($.jPlayer.event.ready + ' ' + $.jPlayer.event.play, function(event) {
+                    var current = myPlaylist.current;
+                    var playlist = myPlaylist.playlist;
+                    $.each(playlist, function(index, obj) {
+                        if (index == current) {
+                            $(".jp-now-playing").html("<div class='jp-track-name'><span class='que_img'><img src='"+obj.image+"'></span><div class='que_data'>" + obj.title + " <div class='jp-artist-name'>" + obj.artist + "</div></div></div>");
+                        }
+                    });
+            });
         }
 
     });
-</script>
 
+</script>
 
 	@hasSection ('js')
 		@yield('js')

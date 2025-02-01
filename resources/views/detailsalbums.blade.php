@@ -64,7 +64,7 @@
                                                    data-title="{{$i}}. {{$single->titre}}"
                                                    data-artist="{{$single->User->nomartiste}}"
                                                    data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                   data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
+                                                   data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
                                                     <span class="single-item__cover d-flex align-items-center justify-content-center bg-light rounded-circle shadow-sm"
                                                           style="width: 50px; height: 50px; overflow: hidden;">
                                                         <img src="{{ asset('usx_files/covers/' . $single->cover) }}" alt="{{ $single->titre }}" class="img-fluid" style="width: 100%; height: auto;">

@@ -163,11 +163,13 @@
                                             <a href="javascript:;" class="jp-playlist-item"
                                                 data-title="{{ $i }}. {{ $single->titre }}"
                                                 data-artist="{{ $single->User->nomartiste }}"
+                                                data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
                                                 data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                 data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
                                                 <span class="que_img"><img
                                                         src="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                        class="mCS_img_loaded"></span>
+                                                        class="mCS_img_loaded">
+                                                </span>
                                             </a>
                                         </div>
                                         <div class="post-content media-body">
@@ -182,8 +184,8 @@
                                                     <a href="javascript:;" class="add"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
                                                         data-artist="{{ $single->User->nomartiste }}"
-                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                        data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
+                                                        data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
+                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}">
                                                         <span class="opt_icon"><i
                                                                 class="ms_icon icon_playlist"></i></span>
                                                         Ajouter à la playlist
@@ -192,8 +194,8 @@
                                                 <li><a href="javascript:;" class="play-song"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
                                                         data-artist="{{ $single->User->nomartiste }}"
-                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                        data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
+                                                        data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
+                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}">
                                                         <span class="opt_icon"><span
                                                                 class="icon icon_share"></span></span>
                                                         Jouer
