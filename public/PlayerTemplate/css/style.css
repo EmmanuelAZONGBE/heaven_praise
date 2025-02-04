@@ -40,6 +40,44 @@ Author: Kamleshyadav
 
 /*====Player Css Start====*/
 /* Plus Icon Styling */
+.data-hover-menu {
+    display: none;
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 45px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.sm-grid-content {
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+}
+
+.sm-grid-content:hover {
+    transform: scale(1.05);
+}
+
+.sm-grid-content:hover .data-hover-menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.data-hover-menu li a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 100%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+}
 .ms_more_icon {
     position: absolute;
     top: 10px;

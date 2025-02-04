@@ -164,10 +164,9 @@
                                                 data-title="{{ $i }}. {{ $single->titre }}"
                                                 data-artist="{{ $single->User->nomartiste }}"
                                                 data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
-                                                data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
-                                                <span class="que_img"><img
-                                                        src="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                data-img="{{ asset('usx_files/covers/' . $single->cover) }}">
+                                                <span class="que_img">
+                                                    <img src="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                         class="mCS_img_loaded">
                                                 </span>
                                             </a>
@@ -175,31 +174,42 @@
                                         <div class="post-content media-body">
                                             <h6 class="post-title mb-10 text-limit-2-row">{{ $i }}.
                                                 {{ $single->titre }}</h6>
-                                            <!-- Plus Icon and Menu -->
-                                            <div class="ms_more_icon">
-                                                <span class="plus-icon">+</span>
-                                            </div>
-                                            <ul class="more_option">
+
+                                            <!-- Menu affiché au survol -->
+                                            <ul class="data-hover-menu">
                                                 <li>
                                                     <a href="javascript:;" class="add"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
                                                         data-artist="{{ $single->User->nomartiste }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
                                                         data-img="{{ asset('usx_files/covers/' . $single->cover) }}">
-                                                        <span class="opt_icon"><i
-                                                                class="ms_icon icon_playlist"></i></span>
-                                                        Ajouter à la playlist
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20"
+                                                            height="20" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <line x1="12" y1="5" x2="12"
+                                                                y2="19"></line>
+                                                            <line x1="5" y1="12" x2="19"
+                                                                y2="12"></line>
+                                                        </svg>
+
                                                     </a>
                                                 </li>
-                                                <li><a href="javascript:;" class="play-song"
+                                                <li>
+                                                    <a href="javascript:;" class="play-song"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
                                                         data-artist="{{ $single->User->nomartiste }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
                                                         data-img="{{ asset('usx_files/covers/' . $single->cover) }}">
-                                                        <span class="opt_icon"><span
-                                                                class="icon icon_share"></span></span>
-                                                        Jouer
-                                                    </a></li>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20"
+                                                            height="20" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                        </svg>
+
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -207,6 +217,7 @@
                                 @empty
                                     <p class="text-center">Aucun Single disponible</p>
                                 @endforelse
+
                             </div>
                         </div>
                     </div>

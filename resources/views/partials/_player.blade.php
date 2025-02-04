@@ -70,8 +70,8 @@
                                 <span class="jp-duration" role="timer" aria-label="duration">&nbsp;</span>
                             </div>
                             <div class="jp-progress">
-                                <div class="jp-seek-bar" style="width: 100%;">
-                                    <div class="jp-play-bar" style="width: 1.79091%;">
+                                <div class="jp-seek-bar" >
+                                    <div class="jp-play-bar">
                                         <div class="bullet">
                                         </div>
                                     </div>

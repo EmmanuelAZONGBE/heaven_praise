@@ -529,6 +529,12 @@
                 }
             });
 
+            // Permettre la lecture en cliquant sur le titre
+             $(".single-item__title a").on("click", function (e) {
+            e.preventDefault(); // Empêche la navigation
+            $(this).closest(".single-item").find(".play-single").trigger("click"); // Simule un clic sur le bouton play
+            });
+
             // Suppression de toutes les chansons sauf celle par défaut
             $('.ms_clear').on('click', function() {
                 if (confirm("Voulez-vous vraiment réinitialiser la playlist ?")) {
@@ -544,6 +550,7 @@
             $("#jquery_jplayer_1").on($.jPlayer.event.ready + ' ' + $.jPlayer.event.play, function(event) {
                     var current = myPlaylist.current;
                     var playlist = myPlaylist.playlist;
+                    var play = myPlaylist.play;
                     $.each(playlist, function(index, obj) {
                         if (index == current) {
                             $(".jp-now-playing").html("<div class='jp-track-name'><span class='que_img'><img src='"+obj.image+"'></span><div class='que_data'>" + obj.title + " <div class='jp-artist-name'>" + obj.artist + "</div></div></div>");
@@ -555,6 +562,8 @@
     });
 
 </script>
+
+
 
 	@hasSection ('js')
 		@yield('js')

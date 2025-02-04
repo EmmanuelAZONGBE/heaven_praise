@@ -58,24 +58,50 @@
                                 <div class="bt-1 border-color-1">
                                     <ul class="main__list main__list--playlist main__list--dashbox">
                                         @php $i = 1; @endphp
+                                        <style>
+                                            .content-details-hover {
+                                                display: none;
+                                                top: 0.6rem;
+                                                left: 0.7rem;
+                                                border-radius: 100%;
+                                                padding: 0.3rem;
+                                            }
+                                            .hover-details:hover .content-details-hover {
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                                background-color: #00000060;
+                                            }
+                                        </style>
                                         @forelse ($singles as $single)
-                                            <li class="single-item d-flex align-items-center mb-3">
-                                                <a href="javascript:;" class="jp-playlist-item play-single"
-                                                   data-title="{{$i}}. {{$single->titre}}"
-                                                   data-artist="{{$single->User->nomartiste}}"
-                                                   data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                   data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
-                                                    <span class="single-item__cover d-flex align-items-center justify-content-center bg-light rounded-circle shadow-sm"
-                                                          style="width: 50px; height: 50px; overflow: hidden;">
-                                                        <img src="{{ asset('usx_files/covers/' . $single->cover) }}" alt="{{ $single->titre }}" class="img-fluid" style="width: 100%; height: auto;">
+                                            <li class="single-item hover-details  d-flex align-items-center mb-3">
+                                                <a href="javascript:;" class="position-relative jp-playlist-item play-single"
+                                                    data-title="{{ $i }}. {{ $single->titre }}"
+                                                    data-artist="{{ $single->User->nomartiste }}"
+                                                    data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                    data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
+                                                    <span
+                                                        class="single-item__cover d-flex align-items-center justify-content-center bg-light rounded-circle shadow-sm"
+                                                        style="width: 50px; height: 50px; overflow: hidden;">
+                                                        <img src="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                            alt="{{ $single->titre }}" class="img-fluid"
+                                                            style="width: 100%; height: auto;">
+                                                    </span>
+                                                    <span class="position-absolute content-details-hover">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                            viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                                        </svg>
                                                     </span>
                                                 </a>
                                                 <div class="single-item__title ml-3">
                                                     <h4 class="mb-1" style="font-size: 14px;">
-                                                        <a href="#">{{$i}}. {{$single->titre}}</a>
+                                                        <a href="#">{{ $i }}. {{ $single->titre }}</a>
                                                     </h4>
                                                     <span style="font-size: 12px;">
-                                                        <a href="{{ route('detailsartistes', ['heavenid' => $single->User->heavenid]) }}">{{ $single->User->nomartiste }}</a>
+                                                        <a
+                                                            href="{{ route('detailsartistes', ['heavenid' => $single->User->heavenid]) }}">{{ $single->User->nomartiste }}</a>
                                                     </span>
                                                 </div>
                                             </li>
