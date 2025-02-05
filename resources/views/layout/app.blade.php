@@ -514,16 +514,17 @@
                 var artist = $(this).data('artist');
                 var img = $(this).data('img');
                 var mp3 = $(this).data('mp3');
+                localStorage.setItem(localStorageKeys.single, JSON.stringify({title, artist, img, mp3}));
                 console.log(" current  song is  playing");
 
                 if (title && artist && img && mp3) {
                     $("#jquery_jplayer_1").jPlayer("setMedia", { mp3, oga: mp3.replace('.mp3', '.ogg') }).jPlayer("play");
                     currentSong = { title, artist, img, mp3 };
-
+                    console.log(currentSong," current");
                     // Mise à jour des informations sur la barre de lecture
                     $('.jp-track-name').text(title);
                     $('.jp-artist-name').text(artist);
-                    $('.jp-cover-art').attr('src', img); // Mettez à jour l'image de couverture si nécessaire
+                    $('.jp-cover-art').attr('src', img);
                 } else {
                     console.error('Données manquantes pour jouer la chanson.');
                 }
@@ -531,8 +532,8 @@
 
             // Permettre la lecture en cliquant sur le titre
              $(".single-item__title a").on("click", function (e) {
-            e.preventDefault(); // Empêche la navigation
-            $(this).closest(".single-item").find(".play-single").trigger("click"); // Simule un clic sur le bouton play
+            e.preventDefault();
+            $(this).closest(".single-item").find(".play-single").trigger("click");
             });
 
             // Suppression de toutes les chansons sauf celle par défaut
@@ -548,9 +549,16 @@
             $('#save-playlist').on('click', savePlaylistToStorage);
 
             $("#jquery_jplayer_1").on($.jPlayer.event.ready + ' ' + $.jPlayer.event.play, function(event) {
+                     var single = localStorage.getItem(localStorageKeys.single);
+                     console.log(single,"single");
+                     if(single){
+                        localStorage.removeItem(localStorageKeys.single);
+                         return;
+                     }
                     var current = myPlaylist.current;
                     var playlist = myPlaylist.playlist;
                     var play = myPlaylist.play;
+                    console.log(current,"emmanuel");
                     $.each(playlist, function(index, obj) {
                         if (index == current) {
                             $(".jp-now-playing").html("<div class='jp-track-name'><span class='que_img'><img src='"+obj.image+"'></span><div class='que_data'>" + obj.title + " <div class='jp-artist-name'>" + obj.artist + "</div></div></div>");
