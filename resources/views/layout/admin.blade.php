@@ -28,7 +28,7 @@
 	<body>
 	<main id="main-wrapper" class="main-wrapper">
 		@include('adm.partials._nav')
-		
+
 		<div id="app-content">
 			@yield('content')
 		</div>
@@ -38,7 +38,7 @@
 	<!-- quill js -->
 	<script src="{{asset('Adm_assets/libs/quill/dist/quill.min.js')}}"></script>
 	<script src="{{asset('Adm_assets/libs/@yaireo/tagify/dist/tagify.min.js')}}"></script>
-	
+
 	<!-- Libs JS -->
 	<script src="{{asset('Adm_assets/libs/jquery/dist/jquery.min.js')}}"></script>
 	<script src="{{asset('Adm_assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')}}"></script>

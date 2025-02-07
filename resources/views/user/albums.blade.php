@@ -16,7 +16,7 @@
             </div>
         </div>
     </div>
-    
+
 @endsection
 @section('content')
 <div class="tab-content dashboard-content">
@@ -34,7 +34,7 @@
                             <div class="heading_s1 mb-3">
                                 <h6><i class="ti-plus"></i> Nouvel Album</h6><hr>
                             </div>
-                            
+
                             <form action="{{route('user.storealbums')}}" class="" method="POST" enctype="multipart/form-data">
                                 {{ csrf_field() }}
                                 <div class="row">
@@ -95,7 +95,7 @@
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered">
-                                    
+
                                     <thead>
                                         <tr>
                                             <th>№</th>
@@ -118,10 +118,10 @@
                                                 </td>
                                                 <td>
                                                     <img src="{{asset('usx_files/covers/'.$album->cover)}}" alt="" style="width:80px;">
-                                                </td>	
+                                                </td>
                                                 <td>
                                                     <div class="main__table-text">
-                                                        <a href="{{route('user.titrealbums',['slug'=>$album->slug])}}">{{$album->titre}} <br> 
+                                                        <a href="{{route('user.titrealbums',['slug'=>$album->slug])}}">{{$album->titre}} <br>
                                                             @php
                                                                 $titres=App\Models\Single::where('album_id',$album->id)->count();
                                                             @endphp
@@ -158,16 +158,20 @@
                                                                 <a href="{{route('user.unmaskalbums',['slug'=>$album->slug])}}" class="btn btn-success" title="Rendre Visible cet album">
                                                                     <span class="ti-eye"></span> Rendre Visible
                                                                 </a>
-                                                            @else  
+                                                            @else
                                                                 <a href="{{route('user.maskalbums',['slug'=>$album->slug])}}" class="btn btn-dark " title="Masquer cet album">
                                                                     <span class="ti-remove"></span>Masquer
                                                                 </a>
                                                             @endif
                                                         </li>
                                                         <li class="single-item">
-                                                            <a href="#" class="btn btn-danger " title="Supprimer ce titre">
-                                                                <span class="ti-trash"></span> Supprimer
-                                                            </a>
+                                                            <form action="{{ route('user.deletealbums', ['slug' => $album->slug]) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet album ?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-danger" title="Supprimer cet album">
+                                                                    <span class="ti-trash"></span> Supprimer
+                                                                </button>
+                                                            </form>
                                                         </li>
                                                     </ul>
                                                 </td>
@@ -176,7 +180,7 @@
                                                 $i=$i+1;
                                             @endphp
                                         @empty
-                                            
+
                                         @endforelse
                                     </tbody>
                                 </table>
@@ -195,18 +199,18 @@
 		function readURL(input) {
 			if (input.files && input.files[0]) {
 				var reader = new FileReader();
-				
+
 				reader.onload = function (e) {
 					$('#blah1').attr('src', e.target.result);
 				}
-				
+
 				reader.readAsDataURL(input.files[0]);
 			}
 		}
 		function uploadavatar(){
 			$('#cover').trigger('click');
 		}
-		
+
 		$("#cover").change(function(){
 			readURL(this);
 		});

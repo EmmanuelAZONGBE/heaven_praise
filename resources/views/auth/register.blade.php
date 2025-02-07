@@ -48,7 +48,7 @@
                                     @endif
                                 </div>
                                 <div class="form-group {{ $errors->has('pays') ? ' has-error' : '' }}">
-                                    <select type="text" name="pays" id="pays" class=" custom_select nice-select" required>
+                                    <select name="pays" id="pays"  class="form-control first_null not_chosen full-width" required>
                                         <option value="">Pays</option>
                                         @php
                                             $pays=App\Models\Pays::get()
@@ -56,7 +56,7 @@
                                         @forelse ($pays as $pays)
                                             <option value="{{$pays->id}}">{{$pays->libelle}}</option>
                                         @empty
-                                            
+
                                         @endforelse
                                     </select>
                                     @if ($errors->has('pays'))
@@ -87,7 +87,7 @@
                                     <button type="submit" class="btn btn-fill-out btn-block">Je m'inscris</button>
                                 </div>
                             </form>
-                            
+
                         </div>
                     </div>
                 </div>

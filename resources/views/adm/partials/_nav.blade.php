@@ -186,7 +186,7 @@
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.newsingles')}}">Nouveaux Singles</a></li>
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.singles')}}">En Ligne</a></li>
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.restrictedsingles')}}">Restreints</a></li>
-                            
+
                             <li><span class="dropdown-header"> Actions Artiste</span></li>
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.maskedsingles')}}">Masqués</a></li>
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.visiblessingles')}}">Visibles</a></li>
@@ -199,7 +199,7 @@
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.newalbums')}}">Nouveaux Albums</a></li>
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.albums')}}">En Ligne</a></li>
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.restrictedalbums')}}">Restreints</a></li>
-                            
+
                             <li><span class="dropdown-header"> Actions Artiste</span></li>
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.maskedalbums')}}">Masqués</a></li>
                             <li class="nav-item"><a class="dropdown-item" href="{{route('admin.visiblesalbums')}}">Visibles</a></li>
@@ -211,9 +211,9 @@
                             <div class="row">
                                 <div class="col-lg-4">
                                     <ul class="list-unstyled">
-                                        <li><span class="dropdown-header"> PLAYLISTS</span></li>
+                                        {{-- <li><span class="dropdown-header"> PLAYLISTS</span></li>
                                         <li class="nav-item"><a href="components/accordions.html" class="dropdown-item">Créer une playlist</a></li>
-                                        <li class="nav-item"><a class="dropdown-item" href="components/alerts.html"> Liste des playlists</a></li>
+                                        <li class="nav-item"><a class="dropdown-item" href="components/alerts.html"> Liste des playlists</a></li> --}}
                                         <li><span class="dropdown-header"> LIVES / VIDEOS</span></li>
                                         <li class="nav-item"><a href="{{route('admin.newlives')}}" class="dropdown-item">Nouvelle video</a></li>
                                         <li class="nav-item"><a href="{{route('admin.listlives')}}" class="dropdown-item">Liste des videos</a></li>

@@ -88,8 +88,8 @@ class RegisterController extends Controller
         $sujet = "Création de votre compte Heavenly Praise";
 
         $role="Artiste";
-        Mail::to($data['email'])
-        ->send(new Inscriptioncontact($data,$role));
+        // Mail::to($data['email'])
+        // ->send(new Inscriptioncontact($data,$role));
         return User::create([
             'heavenid' => $heavenid,
             'nom' => $data['nom'],

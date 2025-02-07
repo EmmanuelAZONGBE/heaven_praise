@@ -45,7 +45,7 @@
                                     </div>
                                 </form>
                             </div>
-                            
+
 						</div>
 					</div>
 					<div class="col-12 col-md-8">
@@ -89,10 +89,10 @@
                                                             <span class="badge bg-danger">Non</span>
                                                         @else
                                                             <span class="badge bg-success">Oui</span>
-                                                            
+
                                                         @endif
                                                     </td>
-                                                    
+
                                                     <td>
                                                         @if ($forum->actif ==0)
                                                             <a href="{{route('admin.activateforumscommunaute',['id'=>$forum->id])}}" class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip" data-template="forumOne">
@@ -108,19 +108,24 @@
                                                                 <span>Éditer</span>
                                                             </div>
                                                         </a>
-                                                        <a href="#!" class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip"data-template="trashOne">
-                                                            <i data-feather="trash-2" class="icon-xs"></i>
-                                                            <div id="trashOne" class="d-none">
-                                                                <span>Supprimer</span>
-                                                            </div>
-                                                        </a>
+                                                        <form action="{{ route('admin.deletecommunaute', ['id' => $communaute->id]) }}" method="POST"
+                                                            onsubmit="return confirm('Voulez-vous vraiment supprimer cette communauté ?');" style="display:inline;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip" data-template="trashOne">
+                                                                <i data-feather="trash-2" class="icon-xs"></i>
+                                                                <div id="trashOne" class="d-none">
+                                                                    <span>Supprimer</span>
+                                                                </div>
+                                                            </button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                                 @php
                                                     $i=$i+1;
                                                 @endphp
                                             @empty
-                                                
+
                                             @endforelse
 										</tbody>
 									</table>
@@ -145,7 +150,7 @@
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"
             }
-            
+
         } );
     });
 </script>

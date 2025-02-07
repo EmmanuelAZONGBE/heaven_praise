@@ -16,7 +16,7 @@
             </div>
         </div>
     </div>
-    
+
 @endsection
 @section('content')
 
@@ -35,7 +35,7 @@
                             <div class="heading_s1 mb-3">
                                 <h6><i class="ti-plus"></i> Nouveau Titre</h6><hr>
                             </div>
-                            <form action="{route('user.storetitrealbums',['slug'=>$find->slug])}}" class="" method="POST" enctype="multipart/form-data">
+                            <form action="{{route('user.storetitrealbums',['slug'=>$find->slug])}}" class="" method="POST" enctype="multipart/form-data">
                                 {{ csrf_field() }}
                                 <div class="row">
                                     <div class="col-md-4">
@@ -70,7 +70,7 @@
                                                     @forelse ($genres as $genre)
                                                         <option value="{{$genre->id}}" {{(old('genre') == $genre->id ) ? ' selected' : ' '}}>{{$genre->libelle}}</option>
                                                     @empty
-                                                        
+
                                                     @endforelse
                                                 </select>
                                             </div>
@@ -99,7 +99,7 @@
                             </div>
                             <div class="table-responsive">
                                 <table id="singlesList" class="table table-striped table-bordered">
-                                    
+
                                     <thead>
                                         <tr>
                                             <th>№</th>
@@ -128,7 +128,7 @@
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.54,9,8.88,3.46a3.42,3.42,0,0,0-5.13,3V17.58A3.42,3.42,0,0,0,7.17,21a3.43,3.43,0,0,0,1.71-.46L18.54,15a3.42,3.42,0,0,0,0-5.92Zm-1,4.19L7.88,18.81a1.44,1.44,0,0,1-1.42,0,1.42,1.42,0,0,1-.71-1.23V6.42a1.42,1.42,0,0,1,.71-1.23A1.51,1.51,0,0,1,7.17,5a1.54,1.54,0,0,1,.71.19l9.66,5.58a1.42,1.42,0,0,1,0,2.46Z"></path></svg>
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16,2a3,3,0,0,0-3,3V19a3,3,0,0,0,6,0V5A3,3,0,0,0,16,2Zm1,17a1,1,0,0,1-2,0V5a1,1,0,0,1,2,0ZM8,2A3,3,0,0,0,5,5V19a3,3,0,0,0,6,0V5A3,3,0,0,0,8,2ZM9,19a1,1,0,0,1-2,0V5A1,1,0,0,1,9,5Z"></path></svg>
                                                             </a>
-                                                            
+
                                                         </li> --}}
                                                         <div style="text-align:center;">
                                                             <img class="mb-3 " src="{{asset('usx_files/covers/'.$single->cover)}}" alt="{{$single->titre}}" style="width:80px;">
@@ -138,7 +138,7 @@
                                                                 Votre navigateur ne prend pas en charge l'élément audio.
                                                         </audio>
                                                     </div>
-                                                </td>	
+                                                </td>
                                                 <td>
                                                     <div class="single-item__title">
                                                         <span>{{$single->titre}}</span>
@@ -172,9 +172,14 @@
                                                                     <a class="btn btn-fill-out btn-dark mb-3"  href="{{route('user.masksingles',['id'=>$single->id])}}" title="Masquer  ce titre"><i class="ti-close mr-5"></i>Masquer</a>
                                                                 @endif
                                                             </li>
-                                                            <li class="list-inline">  
-                                                                <a class="btn btn-fill-out btn-danger mb-3"  href="#" title="Supprimer ce titre"><i class="ti-trash mr-5"></i>Supprimer</a>
-                                                                
+                                                            <li class="single-item">
+                                                                <form action="{{ route('user.deletesingles', ['id' => $single->id]) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet titre album ?');">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" class="btn btn-danger" title="Supprimer cet album">
+                                                                        <span class="ti-trash"></span> Supprimer
+                                                                    </button>
+                                                                </form>
                                                             </li>
                                                         </ul>
                                                     {{-- </div> --}}
@@ -183,9 +188,9 @@
                                             @php
                                                 $i=$i+1;
                                             @endphp
-                                            
+
                                         @empty
-                                            
+
                                         @endforelse
                                     </tbody>
                                 </table>
@@ -203,18 +208,18 @@
 		function readURL(input) {
 			if (input.files && input.files[0]) {
 				var reader = new FileReader();
-				
+
 				reader.onload = function (e) {
 					$('#blah1').attr('src', e.target.result);
 				}
-				
+
 				reader.readAsDataURL(input.files[0]);
 			}
 		}
 		function uploadavatar(){
 			$('#cover').trigger('click');
 		}
-		
+
 		$("#cover").change(function(){
 			readURL(this);
 		});

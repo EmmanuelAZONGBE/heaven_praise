@@ -73,7 +73,7 @@
 															-
 														@endif
                                                     </td>
-                                                    
+
                                                     <td>
                                                         <a href="{{route('admin.vueartist',['id'=>$artiste->id])}}" class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip"data-template="viewOne">
                                                             <i data-feather="eye" class="icon-xs"></i>
@@ -87,19 +87,29 @@
                                                                 <span>Éditer</span>
                                                             </div>
                                                         </a>
-                                                        <a href="#!" class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip"data-template="trashOne">
-                                                            <i data-feather="trash-2" class="icon-xs"></i>
-                                                            <div id="trashOne" class="d-none">
-                                                                <span>Supprimer</span>
-                                                            </div>
-                                                        </a>
+                                                        <form
+                                                                action="{{ route('admin.deleteartist', ['id' => $artiste->id]) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Voulez-vous vraiment supprimer cet artiste ?');"
+                                                                style="display:inline;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit"
+                                                                    class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip text-danger"
+                                                                    data-template="trashOne">
+                                                                    <i data-feather="trash-2" class="icon-xs"></i>
+                                                                    <div id="trashOne" class="d-none">
+                                                                        <span>Supprimer</span>
+                                                                    </div>
+                                                                </button>
+                                                            </form>
                                                     </td>
                                                 </tr>
                                                 @php
                                                     $i=$i+1;
                                                 @endphp
                                             @empty
-                                                
+
                                             @endforelse
 										</tbody>
 									</table>
@@ -124,7 +134,7 @@
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"
             }
-            
+
         } );
     });
 </script>

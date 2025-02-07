@@ -25,7 +25,7 @@
                             </div>
 							<div class="card-body">
 								<div class="table-responsive" style="overflow-x: auto !important;">
-								
+
                                     <table id="myTable" class="table text-nowrap table-centered mt-0">
                                         <thead class="table-light">
                                             <tr>
@@ -105,7 +105,7 @@
                                                             <a class="btn btn-icon btn-sm btn-ghost rounded-circle" href="#!" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical icon-xs"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
                                                             </a>
-            
+
                                                             <ul class="dropdown-menu">
                                                                 @if ($single->statut=="En Attente")
                                                                     <li><a class="dropdown-item d-flex align-items-center" href="{{route('admin.validatesingle',['id'=>$single->id])}}">Valider</a></li>
@@ -115,7 +115,7 @@
                                                                 @if ($single->statut!="Restreint")
                                                                 <li><a class="dropdown-item d-flex align-items-center" href="{{route('admin.restrictsingle',['id'=>$single->id])}}">Restreindre</a></li>
                                                                 @endif
-                                                                
+
                                                                 @if ((Route::currentRouteName() == 'admin.visiblessingles') || (Route::currentRouteName() == 'admin.maskedsingles'))
                                                                     @if ($single->masque=="0")
                                                                         <li><a class="dropdown-item d-flex align-items-center" href="{{route('admin.masksingle',['id'=>$single->id])}}">Masquer</a></li>
@@ -123,9 +123,19 @@
                                                                         <li><a class="dropdown-item d-flex align-items-center" href="{{route('admin.unmasksingle',['id'=>$single->id])}}">Rendre visible</a></li>
                                                                     @endif
                                                                 @endif
-    
+
                                                                 <li><a class="dropdown-item d-flex align-items-center" href="{{route('admin.editsingle',['id'=>$single->id])}}">Éditer</a></li>
-                                                                <li><a class="dropdown-item d-flex align-items-center" href="#!">Supprimer</a></li>
+                                                                <li><form
+                                                                    action="{{ route('admin.deletesingle', ['id' => $single->id]) }}"
+                                                                    method="POST"
+                                                                    onsubmit="return confirm('Voulez-vous vraiment supprimer ce single ?');">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="dropdown-item d-flex align-items-center text-danger">
+                                                                        Supprimer
+                                                                    </button>
+                                                                </form>
                                                             </ul>
                                                         </div>
                                                     </td>
@@ -134,7 +144,7 @@
                                                     $i=$i+1;
                                                 @endphp
                                             @empty
-                                                
+
                                             @endforelse
                                         </tbody>
                                     </table>
@@ -159,7 +169,7 @@
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"
             }
-            
+
         } );
     });
 </script>

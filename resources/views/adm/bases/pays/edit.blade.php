@@ -56,7 +56,7 @@
                                     </div>
                                 </form>
                             </div>
-                            
+
 						</div>
 					</div>
 					<div class="col-12 col-md-8">
@@ -110,9 +110,9 @@
                                                     <td>
                                                         {{App\Models\Forumpays::where('pays_id',$pays->id)->count()}}
                                                     </td>
-                                                    
+
                                                     <td>
-                                                        
+
                                                         <a href="{{route('admin.forumspays',['id'=>$pays->id])}}" class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip" data-template="forumOne">
                                                             <i data-feather="users" class="icon-xs"></i>
                                                             <div id="forumOne" class="d-none">
@@ -125,19 +125,23 @@
                                                                 <span>Éditer</span>
                                                             </div>
                                                         </a>
-                                                        <a href="#!" class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip"data-template="trashOne">
-                                                            <i data-feather="trash-2" class="icon-xs"></i>
-                                                            <div id="trashOne" class="d-none">
-                                                                <span>Supprimer</span>
-                                                            </div>
-                                                        </a>
+                                                        <form action="{{ route('admin.deletepays', ['id' => $pays->id]) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer ce pays ?');" style="display:inline;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-ghost btn-icon btn-sm rounded-circle texttooltip">
+                                                                <i data-feather="trash-2" class="icon-xs"></i>
+                                                                <div id="trashOne" class="d-none">
+                                                                    <span>Supprimer</span>
+                                                                </div>
+                                                            </button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                                 @php
                                                     $i=$i+1;
                                                 @endphp
                                             @empty
-                                                
+
                                             @endforelse
 										</tbody>
 									</table>
@@ -162,7 +166,7 @@
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/French.json"
             }
-            
+
         } );
     });
 </script>

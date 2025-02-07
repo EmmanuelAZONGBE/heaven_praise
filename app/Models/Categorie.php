@@ -9,7 +9,8 @@ class Categorie extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'libelle','slug'
+        'libelle',
+        'slug'
     ];
     public function actualite()
     {
@@ -19,4 +20,10 @@ class Categorie extends Model
     {
         return $this->hasMany('App\Models\Evenement');
     }
+
+    public function articles()
+    {
+        return $this->hasMany('App\Models\Article');
+    }
+
 }
