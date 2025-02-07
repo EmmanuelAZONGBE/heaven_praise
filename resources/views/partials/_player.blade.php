@@ -26,12 +26,12 @@
                                     Ajouter à la playlist
                                 </a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a href="javascript:;" class="share-song">
                                     <span class="song_optn_icon"><i class="ms_icon icon_share"></i></span>
                                     Partager
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
                     <span class="play-left-arrow"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
@@ -53,7 +53,7 @@
                         </div>
                         <div class="jp_queue_btn">
                             <a href="javascript:;" class="ms_clear" id="clear-playlist">Effacer</a>
-                            <a href="javascript:;" class="ms_save" id="save-playlist">Sauvegarder</a>
+                            {{-- <a href="javascript:;" class="ms_save" id="save-playlist">Sauvegarder</a> --}}
                         </div>
                     </div>
                 </div>
