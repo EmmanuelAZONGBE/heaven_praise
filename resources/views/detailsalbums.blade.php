@@ -66,6 +66,7 @@
                                                 border-radius: 100%;
                                                 padding: 0.3rem;
                                             }
+
                                             .hover-details:hover .content-details-hover {
                                                 display: flex;
                                                 align-items: center;
@@ -75,7 +76,9 @@
                                         </style>
                                         @forelse ($singles as $single)
                                             <li class="single-item hover-details  d-flex align-items-center mb-3">
-                                                <a href="javascript:;" class="position-relative jp-playlist-item play-single"
+                                                <a href="javascript:;"
+                                                    class="position-relative jp-playlist-item play-single"
+                                                    data-id="{{ $single->id }}" data-artiste-id="{{ $artistes->id }}"
                                                     data-title="{{ $i }}. {{ $single->titre }}"
                                                     data-artist="{{ $single->User->nomartiste }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
@@ -88,8 +91,8 @@
                                                             style="width: 100%; height: auto;">
                                                     </span>
                                                     <span class="position-absolute content-details-hover">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                            viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20"
+                                                            height="20" viewBox="0 0 24 24" fill="none" stroke="#fff"
                                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                             <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                                         </svg>

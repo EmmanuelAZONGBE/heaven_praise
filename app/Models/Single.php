@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Single extends Model
 {
-    
+
     protected $fillable = [
         'titre','cover','audio','statut','masque','genre_id','user_id','album_id'
     ];
@@ -25,5 +25,10 @@ class Single extends Model
     public function singleplaylist()
     {
         return $this->belongsTo('App\Models\Singleplaylist');
+    }
+
+    public function ecoutes()
+    {
+        return $this->hasOne(Ecoute::class, 'song_id');
     }
 }

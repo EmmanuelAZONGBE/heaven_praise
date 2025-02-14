@@ -15,7 +15,22 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'heavenid','sessionid','nom','email','telephone','role','nomartiste','valide','restreint','avatar','password','description','pays_id','communaute_id','paroisse_id'
+        'heavenid',
+        'sessionid',
+        'nom',
+        'email',
+        'telephone',
+        'role',
+        'nomartiste',
+        'valide',
+        'restreint',
+        'avatar',
+        'nombre_ecoutes',
+        'password',
+        'description',
+        'pays_id',
+        'communaute_id',
+        'paroisse_id'
     ];
 
     /**
@@ -24,9 +39,21 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
+
+    public function singles()
+    {
+        return $this->hasMany(Single::class, 'user_id', 'id');
+    }
+
+    public function getTotalEcoutesAttribute()
+    {
+        return $this->singles()->sum('nombre_ecoutes');
+    }
+    
 
     public function pays()
     {

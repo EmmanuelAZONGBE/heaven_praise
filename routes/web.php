@@ -12,6 +12,7 @@
 */
 Route::get('/', [App\Http\Controllers\GuestController::class, 'index'])->name('welcome');
 
+Route::post('/ecouter-chanson', [App\Http\Controllers\GuestController::class, 'ecouterChanson'])->name('ecouterChanson');
 Route::get('/checkout-login', [App\Http\Controllers\GuestController::class, 'index'])->name('checkoutloginindex');
 Route::post('/checkout-login', [App\Http\Controllers\GuestController::class, 'checkoutlogin'])->name('checkoutlogin');
 
@@ -58,6 +59,7 @@ Route::group(['prefix' => 'evenements/{slug}/'], function () {
 });
 
 Route::group(['prefix' => 'tabeau-de-bord/'], function () {
+
 
     Route::get('/', [App\Http\Controllers\UserController::class, 'index'])->name('user.dashboard');
 

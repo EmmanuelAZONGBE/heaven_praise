@@ -53,6 +53,12 @@
                                     <li class="author-social-link-twitter"><a href="#"><i class="ti-music"></i>
                                             {{ $countsingle = $singles->where('statut', 'En Ligne')->where('masque', 0)->count() }}
                                             {{ $countsingle > 1 ? 'Singles' : 'Single' }}</a></li>
+                                    <li class="author-social-link-ecoute">
+                                        <a href="#"><i class="ti-headphone-alt"></i>
+                                            {{ $totalEcoutes }}
+                                            {{ $totalEcoutes > 1 ? 'Écoutes' : 'Écoute' }}
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -178,7 +184,8 @@
                                             <!-- Menu affiché au survol -->
                                             <ul class="data-hover-menu">
                                                 <li>
-                                                    <a href="javascript:;" class="add"
+                                                    <a href="javascript:;" class="add" data-id="{{ $single->id }}"
+                                                        data-artiste-id="{{ $artistes->id }}"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
                                                         data-artist="{{ $single->User->nomartiste }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
@@ -197,6 +204,8 @@
                                                 </li>
                                                 <li>
                                                     <a href="javascript:;" class="play-song"
+                                                        data-id="{{ $single->id }}"
+                                                        data-artiste-id="{{ $artistes->id }}"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
                                                         data-artist="{{ $single->User->nomartiste }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"

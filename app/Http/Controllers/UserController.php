@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Intervention\Image\Facades\Image;
 use App\Models\User;
+use App\Models\Ecoute;
 use App\Models\Genre;
 use App\Models\Single;
 use App\Models\Album;
@@ -352,4 +353,7 @@ class UserController extends Controller
         // Rediriger l'utilisateur avec un message de succès
         return redirect()->back()->with('success', 'L\'album "' . $album->titre . '" a été supprimé avec succès!');
     }
+
+    
+
 }
