@@ -11,7 +11,7 @@
 |
 */
 Route::get('/', [App\Http\Controllers\GuestController::class, 'index'])->name('welcome');
-
+Route::get('/get-updated-sections', [App\Http\Controllers\GuestController::class, 'getUpdatedSections']);
 Route::post('/ecouter-chanson', [App\Http\Controllers\GuestController::class, 'ecouterChanson'])->name('ecouterChanson');
 Route::get('/checkout-login', [App\Http\Controllers\GuestController::class, 'index'])->name('checkoutloginindex');
 Route::post('/checkout-login', [App\Http\Controllers\GuestController::class, 'checkoutlogin'])->name('checkoutlogin');

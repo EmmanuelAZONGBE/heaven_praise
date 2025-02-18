@@ -8,7 +8,14 @@ class Single extends Model
 {
 
     protected $fillable = [
-        'titre','cover','audio','statut','masque','genre_id','user_id','album_id'
+        'titre',
+        'cover',
+        'audio',
+        'statut',
+        'masque',
+        'genre_id',
+        'user_id',
+        'album_id'
     ];
     public function album()
     {
@@ -18,10 +25,10 @@ class Single extends Model
     {
         return $this->belongsTo('App\Models\Genre');
     }
-    public function user()
-    {
-        return $this->belongsTo('App\Models\User');
-    }
+    // public function user()
+    // {
+    //     return $this->belongsTo('App\Models\User');
+    // }
     public function singleplaylist()
     {
         return $this->belongsTo('App\Models\Singleplaylist');
@@ -29,6 +36,12 @@ class Single extends Model
 
     public function ecoutes()
     {
-        return $this->hasOne(Ecoute::class, 'song_id');
+        return $this->hasMany(Ecoute::class, 'song_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
 }

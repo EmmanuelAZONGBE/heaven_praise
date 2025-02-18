@@ -21,6 +21,7 @@ use App\Models\Evenementcommentaire;
 use App\Models\Actualitecommentaire;
 use App\Models\Ticketevenement;
 use App\Models\Livraison;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Facades\Image;
@@ -95,6 +96,41 @@ class GuestController extends Controller
             ->take(4);
         $lastevent = Evenement::orderBy('id', 'Desc')->where('statut', 'Publié')->first();
         $listlastevents = Evenement::orderBy('id', 'Desc')->where('statut', 'Publié')->get()->take('2');
+
+        // Top chansons de la semaine
+        $topSongsThisWeek = Single::select('singles.*', 'users.nomartiste')
+            ->selectSub(function ($query) {
+                $query->from('ecoutes')
+                    ->whereColumn('ecoutes.single_id', 'singles.id')
+                    ->where('ecoutes.created_at', '>=', Carbon::now()->startOfWeek())
+                    ->groupBy('ecoutes.single_id')  // Pour éviter les doublons et bien compter les écoutes
+                    ->selectRaw('SUM(ecoutes.nombre_ecoutes)');  // Somme des écoutes pour chaque chanson
+            }, 'ecoutes_count')
+            ->leftJoin('users', 'users.heavenid', '=', 'singles.user_id')  // Jointure avec la table users
+            ->orderBy('ecoutes_count', 'desc')
+            ->take(8)  // Sélectionner 8 meilleurs
+            ->get();
+
+
+        $recommendedSongs = DB::select("
+        SELECT * FROM `singles`
+        WHERE `is_recommended` = 1
+          AND `masque` = 0
+          AND `statut` = 'En Ligne'
+          AND NOT EXISTS (
+              SELECT * FROM `ecoutes`
+              WHERE `singles`.`id` = `ecoutes`.`single_id`
+          )
+        ORDER BY `id` DESC
+        LIMIT 8
+    ");
+
+        // Convertir les résultats en collection et charger les informations de l'artiste
+        $recommendedSongs = collect($recommendedSongs)->map(function ($single) {
+            $single->User = User::find($single->user_id);  // Charger l'artiste via l'ID de l'utilisateur
+            return $single;
+        });
+
         return view('welcome', compact(
             'comingevents',
             'artistes',
@@ -112,9 +148,14 @@ class GuestController extends Controller
             'topcats',
             'lastevent',
             'listlastevents',
-            'slidescats'
+            'slidescats',
+            'topSongsThisWeek',    // Ajouter les chansons top de la semaine
+            'recommendedSongs'  // Ajouter les chansons recommandées
         ));
     }
+
+
+
     public function addtoplaylist(Request $req)
     {
         if (!Auth::guest()) {
@@ -209,8 +250,18 @@ class GuestController extends Controller
         $derniersalbums = Album::orderBy('id', 'Desc')->where('user_id', $artistes->id)->where('masque', 0)->where('statut', 'En Ligne')->get()->take(6);
         // Calculer la somme des écoutes de tous les singles de cet artiste
         $totalEcoutes = Ecoute::whereIn('single_id', $singles->pluck('id'))->sum('nombre_ecoutes');
-
-
+        // // Calculer les chansons les plus écoutées cette semaine et ce mois
+        // $topSongsThisWeek = Single::select('singles.*', 'users.nomartiste')
+        //     ->selectSub(function ($query) {
+        //         $query->from('ecoutes')
+        //             ->whereColumn('ecoutes.single_id', 'singles.id')
+        //             ->where('ecoutes.created_at', '>=', Carbon::now()->startOfWeek())
+        //             ->selectRaw('COUNT(*)');
+        //     }, 'ecoutes_count')
+        //     ->leftJoin('users', 'users.heavenid', '=', 'singles.user_id') // Jointure avec la table users
+        //     ->orderBy('ecoutes_count', 'desc')
+        //     ->take(5)
+        //     ->get();
         return view('detailsartistes', compact('artistes', 'singles', 'albums', 'derniersalbums', 'videos', 'totalEcoutes'));
     }
 

@@ -21,7 +21,6 @@
             font-size: 15px !important  ;
         }
     </style>
-
     <link rel="apple-touch-icon" sizes="57x57" href="{{asset('assets/icons/apple-icon-57x57.png')}}">
     <link rel="apple-touch-icon" sizes="60x60" href="{{asset('assets/icons/apple-icon-60x60.png')}}">
     <link rel="apple-touch-icon" sizes="72x72" href="{{asset('assets/icons/apple-icon-72x72.png')}}">
@@ -58,7 +57,10 @@
 	@hasSection ('css')
 		@yield('css')
 	@endif
+    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- jQuery (nécessaire pour Bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -853,6 +855,7 @@
                     console.error('Données manquantes pour jouer la chanson.');
                 }
             });
+
             let currentSongId = null; // Variable globale pour stocker l'ID de la chanson en cours
 
             let hasPlayedToEnd = false;
@@ -937,6 +940,29 @@
             });
         }
 
+        // Partager
+        $('.action-btn.share').on('click', function(event) {
+            event.preventDefault();
+            var title = $(this).closest('.song-card').data('title');
+            var artist = $(this).closest('.song-card').data('artist');
+            var shareText = 'Écoutez "' + title + '" par ' + artist + ' sur Heavenly Praise!';
+            var shareUrl = window.location.href;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    text: shareText,
+                    url: shareUrl
+                }).then(() => {
+                    console.log('Partage réussi');
+                }).catch((error) => {
+                    console.error('Erreur de partage:', error);
+                });
+            } else {
+                // Solution de repli pour les navigateurs qui ne supportent pas l'API de partage
+                alert('Fonctionnalité de partage non supportée sur ce navigateur.');
+            }
+        });
     });
 
 </script>
