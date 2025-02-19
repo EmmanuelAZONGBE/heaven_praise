@@ -305,8 +305,8 @@
                                 <h4 class="mb-24">Top des chansons cette semaine</h4>
                                 <div class="songs-list">
                                     @php $i = 1; @endphp
-                                    @forelse ($topSongsThisWeek as $index => $single)
-                                        <div class="song-card {{ $index >= 4 ? 'hidden-song' : '' }}">
+                                    @forelse ($topSongsThisWeek as $single)
+                                        <div class="song-card">
                                             <div class="left-block">
                                                 <div class="play">
                                                     <a href="javascript:;" class="joue play-s1"
@@ -351,6 +351,7 @@
                                                 </a>
                                                 <a href="javascript:;" class="action-btn share"
                                                     data-title="{{ $single->titre }}"
+                                                    data-cover="{{ $single->cover_url }}"
                                                     data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}">
                                                     <span class="tooltip-pop">Partager</span>
                                                     <i class="fa-solid fa-share"></i>

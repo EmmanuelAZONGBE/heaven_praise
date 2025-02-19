@@ -944,7 +944,8 @@
             event.preventDefault();
             var title = $(this).closest('.song-card').data('title');
             var artist = $(this).closest('.song-card').data('artist');
-            var shareText = 'Écoutez "' + title + '" par ' + artist + ' sur Heavenly Praise!';
+            var coverUrl = $(this).closest('.song-card').data('cover');
+            var shareText = 'Écoutez "' + title + '" par ' + artist + ' sur Heavenly Praise!' + coverUrl;
             var shareUrl = window.location.href;
 
             if (navigator.share) {
