@@ -69,7 +69,7 @@
         }
 
         .songs-list .song-card .left-block div a {
-            font-size: clamp(9px, 0.573vw, 13px);
+            /* font-size: clamp(9px, 0.573vw, 13px); */
         }
 
         @media (max-width: 991px) {
@@ -293,9 +293,14 @@
         <div class="pt-50 pb-50 background-white">
             <div class="container mb-50">
                 <div class="sidebar-widget loop-grid">
-                    <section class="py-40">
+                        <div class="sidebar-widget">
+                            <div class="widget-header position-relative mb-30">
+                                <h5 class="widget-title mb-30 text-uppercase color1 font-weight-ultra">Top des morceaux</h5>
+                                <div class="letter-background">MUSIQUE</div>
+                            </div>
+                        </div>
                         <div class="row row-gap-4">
-                            <!-- Top songs of the week (Left column) -->
+                            <!-- Left Column: Top songs of the week -->
                             <div class="col-xl-6">
                                 <h4 class="mb-24">Top des chansons cette semaine</h4>
                                 <div class="songs-list">
@@ -304,12 +309,13 @@
                                         <div class="song-card {{ $index >= 4 ? 'hidden-song' : '' }}">
                                             <div class="left-block">
                                                 <div class="play">
-                                                    <a href="javascript:;" class="joue" data-id="{{ $single->id }}"
+                                                    <a href="javascript:;" class="joue play-s1"
+                                                        data-id="{{ $single->id }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
                                                         data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
-                                                        data-artist="{{ $single->User->nomartiste }}"
-                                                        class="fas fa-play"></i>
+                                                        data-artist="{{ $single->User->nomartiste ?? 'Artiste inconnu' }}">
+                                                        <i class="fas fa-play"></i>
                                                     </a>
                                                     <span>{{ $i }}</span>
                                                 </div>
@@ -318,12 +324,13 @@
                                                         alt="{{ $single->titre }}">
                                                 @endisset
                                                 <div>
-                                                    <h6 class="title mb-1" style="font-size: 20px;"
+                                                    <h6 class="song mb-1" style="font-size: 15px;"
                                                         data-id="{{ $single->id }}" data-title="{{ $single->titre }}"
-                                                        data-artist="{{ optional($single->User)->nomartiste }}"
+                                                        data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                         data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
-                                                        <a href="#">{{ $i }}. {{ $single->titre }}</a>
+                                                        <a href="javascript:;">{{ $i }}.
+                                                            {{ $single->titre }}</a>
                                                     </h6>
                                                     @if ($single->User)
                                                         <a
@@ -336,15 +343,15 @@
                                             <div class="right-block">
                                                 <a href="javascript:;" class="action-btn add" data-id="{{ $single->id }}"
                                                     data-title="{{ $single->titre }}"
-                                                    data-artist="{{ optional($single->User)->nomartiste }}"
+                                                    data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                    data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
+                                                    data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
                                                     <span class="tooltip-pop">Ajouter à la Playlist</span>
                                                     <i class="fa-solid fa-list"></i>
                                                 </a>
                                                 <a href="javascript:;" class="action-btn share"
                                                     data-title="{{ $single->titre }}"
-                                                    data-artist="{{ optional($single->User)->nomartiste }}">
+                                                    data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}">
                                                     <span class="tooltip-pop">Partager</span>
                                                     <i class="fa-solid fa-share"></i>
                                                 </a>
@@ -352,12 +359,11 @@
                                         </div>
                                         @php $i++; @endphp
                                     @empty
-                                        <p>Aucune chanson écoutée cette semaine.</p>
                                     @endforelse
                                 </div>
                             </div>
 
-                            <!-- Recommended songs (Right column) -->
+                            <!-- Right Column: Recommended songs -->
                             <div class="col-xl-6">
                                 <h4 class="mb-24">Recommandations de chansons</h4>
                                 <div class="songs-list">
@@ -366,13 +372,13 @@
                                         <div class="song-card">
                                             <div class="left-block">
                                                 <div class="play">
-                                                    <a href="javascript:;" class="joue" data-id="{{ $single->id }}"
+                                                    <a href="javascript:;" class="joue play-s2" data-id="{{ $single->id }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
                                                         data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
-                                                        data-artist="{{ optional($single->User)->nomartiste }}">
-                                                            <i class="fas fa-play"></i>
-                                                        </a>
+                                                        data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}">
+                                                        <i class="fas fa-play"></i>
+                                                    </a>
                                                     <span>{{ $i }}</span>
                                                 </div>
                                                 @isset($single->cover)
@@ -380,12 +386,13 @@
                                                         alt="{{ $single->titre }}">
                                                 @endisset
                                                 <div>
-                                                    <h6 class="title mb-1" style="font-size: 20px;"
+                                                    <h6 class="titl mb-1" style="font-size: 15px;"
                                                         data-id="{{ $single->id }}" data-title="{{ $single->titre }}"
-                                                        data-artist="{{ optional($single->User)->nomartiste }}"
+                                                        data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                         data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
-                                                        <a href="#">{{ $i }}. {{ $single->titre }}</a>
+                                                        <a href="javascript:;">{{ $i }}.
+                                                            {{ $single->titre }}</a>
                                                     </h6>
                                                     @if ($single->User)
                                                         <a
@@ -398,34 +405,30 @@
                                             <div class="right-block">
                                                 <a href="javascript:;" class="action-btn add"
                                                     data-id="{{ $single->id }}" data-title="{{ $single->titre }}"
-                                                    data-artist="{{ optional($single->User)->nomartiste }}"
+                                                    data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                    data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}">
+                                                    data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
                                                     <span class="tooltip-pop">Ajouter à la Playlist</span>
                                                     <i class="fa-solid fa-list"></i>
                                                 </a>
                                                 <a href="javascript:;" class="action-btn share"
                                                     data-title="{{ $single->titre }}"
-                                                    data-artist="{{ optional($single->User)->nomartiste }}">
+                                                    data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}">
                                                     <span class="tooltip-pop">Partager</span>
                                                     <i class="fa-solid fa-share"></i>
                                                 </a>
                                             </div>
                                         </div>
-
                                         @php $i++; @endphp
                                     @empty
-                                        <p>Aucune chanson recommandée pour le moment.</p>
                                     @endforelse
                                 </div>
                             </div>
                         </div>
-                    </section>
                 </div>
             </div>
         </div>
         <!-- Releases Area End -->
-
 
 
         <!-- Recent Posts Start -->
@@ -498,6 +501,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="container">
                 <div class="sidebar-widget">
                     <div class="widget-header position-relative mb-30">
@@ -990,31 +994,3 @@
         <!--Recent Articles End -->
     </main>
 @endsection
-
-<script>
-    function updateSections() {
-        $.ajax({
-            url: '/get-updated-sections',
-            method: 'GET',
-            success: function(response) {
-                $('#top-songs-week').html(response.topSongsThisWeek);
-                $('#top-songs-month').html(response.topSongsThisMonth);
-                $('#recommended-songs').html(response.recommendedSongs);
-            }
-        });
-    }
-
-    // Actualiser toutes les 5 minutes
-    setInterval(updateSections, 300000);
-</script>
-
-<!-- jQuery pour afficher les chansons supplémentaires -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $("#loadMoreBtn").click(function() {
-            $(".hidden-song").removeClass("hidden-song"); // Afficher les chansons restantes
-            $(this).hide(); // Masquer le bouton "LOAD MORE"
-        });
-    });
-</script>

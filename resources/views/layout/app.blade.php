@@ -811,8 +811,8 @@
                 }
             });
 
-            // Lecture d'une chanson sélectionnée
-            $('body').on('click', '.play-song, .play-single', function() {
+          // Lecture d'une chanson sélectionnée
+          $('body').on('click', '.play-song, .play-single, .play-s1, .play-s2', function() {
                 var singleId = $(this).data('id');
                 var title = $(this).data('title');
                 var artist = $(this).data('artist');
@@ -855,7 +855,6 @@
                     console.error('Données manquantes pour jouer la chanson.');
                 }
             });
-
             let currentSongId = null; // Variable globale pour stocker l'ID de la chanson en cours
 
             let hasPlayedToEnd = false;
@@ -903,10 +902,10 @@
                 hasPlayedToEnd = false;
             });
 
-            // Permettre la lecture en cliquant sur le titre
-             $(".single-item__title a").on("click", function (e) {
+             // Permettre la lecture en cliquant sur le titre
+             $(".single-item__title a,.titl a, .song a ").on("click", function (e) {
             e.preventDefault();
-            $(this).closest(".single-item").find(".play-single").trigger("click");
+            $(this).closest(".single-item,.song-card").find(".play-single,.play-s2, .play-s1").trigger("click");
             });
 
             // Suppression de toutes les chansons sauf celle par défaut
@@ -940,7 +939,7 @@
             });
         }
 
-        // Partager
+         // Partager
         $('.action-btn.share').on('click', function(event) {
             event.preventDefault();
             var title = $(this).closest('.song-card').data('title');
