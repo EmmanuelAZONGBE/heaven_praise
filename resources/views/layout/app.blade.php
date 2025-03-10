@@ -122,7 +122,7 @@
     <script src="{{asset('assets/js/vendor/jquery.ticker.js')}}"></script>
     <script src="{{asset('assets/js/vendor/jquery.vticker-min.js')}}"></script>
     <script src="{{asset('assets/js/vendor/jquery.scrollUp.min.js')}}"></script>
-    {{-- <script src="{{asset('assets/js/vendor/jquery.nice-select.min.js')}}"></script> --}}
+    <script src="{{asset('assets/js/vendor/jquery.nice-select.min.js')}}"></script>
     <script src="{{asset('assets/js/vendor/jquery.sticky.js')}}"></script>
     <script src="{{asset('assets/js/vendor/perfect-scrollbar.js')}}"></script>
     <script src="{{asset('assets/js/vendor/waypoints.min.js')}}"></script>
@@ -137,7 +137,7 @@
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/swiper/js/swiper.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/jplayer.playlist.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/jquery.jplayer.min.js')}}"></script>
-    {{-- <script type="text/javascript" src="PlayerTemplate/js/plugins/player/audio-player.js"></script> --}}
+    <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/audio-player.js.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/volume.js')}}"></script>
     {{-- <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/nice_select/jquery.nice-select.min.js')}}"></script> --}}
 	<script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/scroll/jquery.mCustomScrollbar.js')}}"></script>
@@ -821,8 +821,6 @@
                 localStorage.setItem(localStorageKeys.single, JSON.stringify({title, artist, img, mp3}));
                 console.log(" current  song is  playing");
 
-
-
                 if (title && artist && img && mp3) {
                     currentSongId = singleId;
                     $("#jquery_jplayer_1").jPlayer("setMedia", { mp3, oga: mp3.replace('.mp3', '.ogg') }).jPlayer("play");
@@ -855,6 +853,7 @@
                     console.error('Données manquantes pour jouer la chanson.');
                 }
             });
+
             let currentSongId = null; // Variable globale pour stocker l'ID de la chanson en cours
 
             let hasPlayedToEnd = false;
@@ -963,6 +962,36 @@
                 alert('Fonctionnalité de partage non supportée sur ce navigateur.');
             }
         });
+
+        $(document).ready(function () {
+    $('.action-btn.like').on('click', function (event) {
+        event.preventDefault();
+        var likeButton = $(this);
+        var likeCountElement = likeButton.siblings('.like-count');
+        var singleId = likeButton.data('id');
+
+        $.ajax({
+            url: "/toggle-like",
+            type: "POST",
+            data: {
+                single_id: singleId,
+                _token: $('meta[name="csrf-token"]').attr('content') // Sécurisation CSRF
+            },
+            success: function (response) {
+                if (response.success) {
+                    likeCountElement.text(response.nombre_aimes);
+                    alert(response.message);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function (xhr) {
+                console.error("Erreur lors de la mise à jour des likes", xhr.responseText);
+            }
+        });
+    });
+});
+
     });
 
 </script>

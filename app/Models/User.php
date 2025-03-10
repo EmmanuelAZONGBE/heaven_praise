@@ -53,13 +53,18 @@ class User extends Authenticatable
     {
         return $this->singles()->sum('nombre_ecoutes');
     }
-    
+
 
     public function pays()
     {
         return $this->belongsTo('App\Models\Pays');
     }
 
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
     public function communaute()
     {
         return $this->belongsTo('App\Models\Communaute');

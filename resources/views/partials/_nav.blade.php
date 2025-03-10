@@ -401,6 +401,7 @@
                                 </li> --}}
                                 <li><a href='{{ route('artistes') }}'>Musique</a></li>
                                 <li><a href='{{ route('videos') }}'>Vidéos</a></li>
+                                <li><a href='{{ route('plans') }}'>Plan</a></li>
                             </ul>
                         </nav>
                     </div>

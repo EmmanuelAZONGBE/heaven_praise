@@ -10,9 +10,11 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+// web.php
 Route::get('/', [App\Http\Controllers\GuestController::class, 'index'])->name('welcome');
 Route::get('/get-updated-sections', [App\Http\Controllers\GuestController::class, 'getUpdatedSections']);
 Route::post('/ecouter-chanson', [App\Http\Controllers\GuestController::class, 'ecouterChanson'])->name('ecouterChanson');
+Route::post('/toggle-like', [App\Http\Controllers\GuestController::class, 'toggleLike'])->name('toggleLike');
 Route::get('/checkout-login', [App\Http\Controllers\GuestController::class, 'index'])->name('checkoutloginindex');
 Route::post('/checkout-login', [App\Http\Controllers\GuestController::class, 'checkoutlogin'])->name('checkoutlogin');
 
@@ -20,6 +22,8 @@ Route::post('/addtoplaylist', [App\Http\Controllers\GuestController::class, 'add
 
 Route::get('/a-propos', [App\Http\Controllers\GuestController::class, 'about'])->name('about');
 Route::get('/videos', [App\Http\Controllers\GuestController::class, 'videos'])->name('videos');
+Route::get('/plans', [App\Http\Controllers\GuestController::class, 'plans'])->name('plans');
+
 
 Route::get('/compte-premium', [App\Http\Controllers\GuestController::class, 'premium'])->name('premium');
 

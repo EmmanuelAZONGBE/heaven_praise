@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +14,7 @@ class Single extends Model
         'masque',
         'genre_id',
         'user_id',
-        'album_id'
+        'album_id',
     ];
     public function album()
     {
@@ -29,6 +28,19 @@ class Single extends Model
     // {
     //     return $this->belongsTo('App\Models\User');
     // }
+
+    // Single.php
+    public function Aime()
+    {
+        return $this->hasMany(Aime::class, 'single_id');
+    }
+
+    public function getNombreAimesAttribute()
+    {
+        return $this->Aime()->count();
+    }
+
+
     public function singleplaylist()
     {
         return $this->belongsTo('App\Models\Singleplaylist');
