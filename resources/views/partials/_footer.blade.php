@@ -199,11 +199,34 @@
         </div>
     </div> --}}
     <!-- footer-bottom aera -->
+    <style>
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            /* Espacement entre les icônes */
+        }
+
+        .social-icon {
+            font-size: 30px;
+            /* Augmenter la taille des icônes */
+            color: #fff;
+            /* Couleur blanche */
+            transition: color 0.3s, transform 0.3s;
+            /* Ajout de transition pour l'effet de survol */
+        }
+
+        .social-icon:hover {
+            color: #007bff;
+            /* Changer la couleur au survol */
+            transform: scale(1.1);
+            /* Agrandir légèrement l'icône au survol */
+        }
+    </style>
     <div class="footer-bottom-area background11">
         <div class="container">
             <div class="footer-border pt-30 pb-30">
                 <div class="row d-flex align-items-center justify-content-between">
-                    
+
                     <div class="col-lg-4">
                         <div class="footer-copy-right">
                             <p class="font-medium">© 2024, Heavenly Praise | Tous droits réservés | Dévéloppé par <a href="https://emmaccorporation.com" target="_blank">Emmac Corporation</a></p>
@@ -297,5 +320,6 @@
             </div>
         </div>
     </div>
+
     <!-- Footer End-->
 </footer>

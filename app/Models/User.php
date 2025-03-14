@@ -60,6 +60,11 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\Pays');
     }
 
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
     public function communaute()
     {
         return $this->belongsTo('App\Models\Communaute');

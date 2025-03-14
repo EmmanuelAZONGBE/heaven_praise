@@ -137,7 +137,7 @@
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/swiper/js/swiper.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/jplayer.playlist.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/jquery.jplayer.min.js')}}"></script>
-    {{-- <script type="text/javascript" src="PlayerTemplate/js/plugins/player/audio-player.js"></script> --}}
+    <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/audio-player.js.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/volume.js')}}"></script>
     {{-- <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/nice_select/jquery.nice-select.min.js')}}"></script> --}}
 	<script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/scroll/jquery.mCustomScrollbar.js')}}"></script>
@@ -522,19 +522,17 @@
                 }
             });
 
-            $(document).ready(function () {
-    let currentSongId = null;
-    let hasPlayedToEnd = false;
+          // Lecture d'une chanson sélectionnée
+          $('body').on('click', '.play-song, .play-single, .play-s1, .play-s2', function() {
+                var singleId = $(this).data('id');
+                var title = $(this).data('title');
+                var artist = $(this).data('artist');
+                var img = $(this).data('img');
+                var mp3 = $(this).data('mp3');
+                localStorage.setItem(localStorageKeys.single, JSON.stringify({title, artist, img, mp3}));
+                console.log(" current  song is  playing");
 
-    // Lorsqu'on clique sur une chanson (incrémentation des clics)
-    $('body').on('click', '.play-song, .play-single, .play-s1, .play-s2', function () {
-        var singleId = $(this).data('id');
-        var title = $(this).data('title');
-        var artist = $(this).data('artist');
-        var img = $(this).data('img');
-        var mp3 = $(this).data('mp3');
 
-        localStorage.setItem(localStorageKeys.single, JSON.stringify({ title, artist, img, mp3 }));
 
         if (title && artist && img && mp3) {
             currentSongId = singleId;
@@ -545,53 +543,68 @@
             $('.jp-artist-name').text(artist);
             $('.jp-cover-art').attr('src', img);
 
-            // Incrémenter le nombre de clics (pas les écoutes encore)
-            $.ajax({
-                url: "/ecouter-chanson",
-                type: "POST",
-                data: {
-                    single_id: singleId,
-                    action: "click", // Indiquer qu'il s'agit d'un clic
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    console.log("Nombre de clics mis à jour :", response.nombre_clicks);
-                },
-                error: function (xhr) {
-                    console.error("Erreur lors de l'incrémentation des clics", xhr.responseText);
+                        // Envoi de la requête AJAX pour incrémenter l'écoute
+                        // $.ajax({
+                        //     url: "/ecouter-chanson",
+                        //     type: "POST",
+                        //     data: {
+                        //         single_id: singleId, // Envoyer l'ID de la chanson
+                        //         _token: $('meta[name="csrf-token"]').attr('content')
+                        //     },
+                        //     success: function(response) {
+                        //         if (response.success) {
+                        //             console.log("Nombre d'écoutes mis à jour :", response.nombre_ecoutes);
+                        //         }
+                        //     },
+                        //     error: function(xhr) {
+                        //         console.error("Erreur lors de l'incrémentation des écoutes", xhr.responseText);
+                        //     }
+                        // });
+                } else {
+                    console.error('Données manquantes pour jouer la chanson.');
                 }
             });
-        } else {
-            console.error('Données manquantes pour jouer la chanson.');
-        }
-    });
+            let currentSongId = null; // Variable globale pour stocker l'ID de la chanson en cours
 
-    // Détection de la fin de la chanson pour incrémenter les écoutes
-    $("#jquery_jplayer_1").on($.jPlayer.event.ended, function () {
-        if (currentSongId) {
-            $.ajax({
-                url: "/ecouter-chanson",
-                type: "POST",
-                data: {
-                    single_id: currentSongId,
-                    action: "ecoute", // Indiquer qu'il s'agit d'une écoute complète
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    console.log("Nombre d'écoutes mis à jour :", response.nombre_ecoutes);
+            let hasPlayedToEnd = false;
 
-                    var hitCountElement = $('#hit-count');
-                    var newHitCount = response.nombre_ecoutes;
-                    var ecouteText = newHitCount > 1 ? 'Écoutes' : 'Écoute';
-                    hitCountElement.text(newHitCount + ' ' + ecouteText);
-                },
-                error: function (xhr) {
-                    console.error("Erreur lors de l'incrémentation des écoutes", xhr.responseText);
+            $("#jquery_jplayer_1").on($.jPlayer.event.timeupdate, function(event) {
+                const currentTime = $("#jquery_jplayer_1").data("jPlayer").status.currentTime;
+                const duration = $("#jquery_jplayer_1").data("jPlayer").status.duration;
+
+                // Vérifiez si la chanson a été écoutée jusqu'à la fin
+                if (currentTime >= duration - 1 && !hasPlayedToEnd) {
+                    hasPlayedToEnd = true;
+
+                    // Envoi de la requête AJAX pour incrémenter l'écoute
+                    const singleId = $(this).data('id');
+                    const artisteId = $(this).attr('data-artiste-id'); // Assure-toi que cet attribut est bien défini
+                    $.ajax({
+                        url: "/ecouter-chanson",
+                        type: "POST",
+                        data: {
+                            single_id: currentSongId, // Utiliser l'ID stocké
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            console.log("Réponse complète:", response);
+                            if (response.success) {
+                                console.log("Nombre d'écoutes mis à jour :", response.nombre_ecoutes);
+                                // Mettre à jour l'interface utilisateur
+                                var hitCountElement = $('#hit-count');
+                                var newHitCount = response.nombre_ecoutes;
+                                var ecouteText = newHitCount > 1 ? 'Écoutes' : 'Écoute';
+
+                                // Mettre à jour le texte de l'élément
+                                hitCountElement.text(newHitCount + ' ' + ecouteText);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error("Erreur lors de l'incrémentation des écoutes",xhr.responseText);
+                        }
+                    });
                 }
             });
-        }
-    });
-});
 
             // Réinitialiser le flag lorsque la chanson change
             $("#jquery_jplayer_1").on($.jPlayer.event.play, function(event) {
@@ -659,39 +672,7 @@
                 alert('Fonctionnalité de partage non supportée sur ce navigateur.');
             }
         });
-
-        $(document).ready(function () {
-            $('.action-btn.like').on('click', function (event) {
-                event.preventDefault();
-                var likeButton = $(this);
-                var likeCountElement = likeButton.siblings('.like-count');
-                var singleId = likeButton.data('id');
-
-                $.ajax({
-                    url: "/toggle-like",
-                    type: "POST",
-                    data: {
-                        single_id: singleId,
-                        _token: $('meta[name="csrf-token"]').attr('content') // Sécurisation CSRF
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            likeCountElement.text(response.nombre_aimes);
-                            alert(response.message);
-                            alert(response.message);
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function (xhr) {
-                        console.error("Erreur lors de la mise à jour des likes", xhr.responseText);
-                    }
-                });
-            });
-        });
-
-
-});
+    });
 
 </script>
 

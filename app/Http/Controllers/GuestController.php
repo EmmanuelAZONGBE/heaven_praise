@@ -210,9 +210,9 @@ class GuestController extends Controller
         return view('videos', compact('videos', 'artistes'));
     }
 
-    public function premium()
+    public function plan()
     {
-        return view('premium');
+        return view('plan');
     }
 
     public function artistes()

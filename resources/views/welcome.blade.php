@@ -300,7 +300,7 @@
                             <div class="sidebar-widget">
                                 <div class="widget-header position-relative mb-30">
                                     <h5 class="widget-title mb-30 text-uppercase color1 font-weight-ultra">Top des chansons
-                                        cette semaine</h5>
+                                        de cette semaine</h5>
                                     <div class="letter-background">M</div>
                                 </div>
                             </div>
@@ -341,6 +341,7 @@
                                             </div>
                                         </div>
                                         <div class="right-block">
+                                            <!-- Ajout du bouton "Ajouter à la Playlist" avec le compteur de Ajouter à la Playlist -->
                                             <a href="javascript:;" class="action-btn add" data-id="{{ $single->id }}"
                                                 data-title="{{ $single->titre }}"
                                                 data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
@@ -349,6 +350,7 @@
                                                 <span class="tooltip-pop">Ajouter à la Playlist</span>
                                                 <i class="fa-solid fa-list"></i>
                                             </a>
+                                            <!-- Ajout du bouton "Partager" avec le compteur de Partager -->
                                             <a href="javascript:;" class="action-btn share"
                                                 data-title="{{ $single->titre }}" data-cover="{{ $single->cover_url }}"
                                                 data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}">
@@ -450,6 +452,7 @@
             </div>
         </div>
         <!-- Releases Area End -->
+
         <!-- Recent Posts Start -->
         <div class="pt-50 pb-50 background-white">
             <div class="container mb-50">
