@@ -80,7 +80,8 @@
                                                             {{ $album->created_at->format('d M Y') }}
                                                         </td>
                                                         <td>
-                                                            0
+                                                            Écoutes:{{ $album->total_ecoutes }}<br>
+                                                            Clics: {{ $album->total_clicks }}
                                                         </td>
                                                         <td>
                                                             @if ($album->statut == 'En Attente')

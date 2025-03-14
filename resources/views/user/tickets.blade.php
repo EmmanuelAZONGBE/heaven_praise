@@ -35,7 +35,7 @@
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-striped table-bordered">
-                                    
+
                                     <thead>
                                         <tr>
                                             <th>№</th>
@@ -62,10 +62,10 @@
                                                 </td>
                                                 <td>
                                                     {{$firstcommande->created_at->format('d-m-Y')}}
-                                                </td>	
+                                                </td>
                                                 <td>
                                                     <small class="badge badge-default"><strong><a href="{{route('user.detailstickets',['sessionid'=>$firstcommande->session_id])}}">HP-{{$reference}}{{$firstcommande->session_id}}</a></strong></small>
-                                                </td>	
+                                                </td>
                                                 <td>
                                                     {{$event->titre}}
                                                 </td>
@@ -75,18 +75,18 @@
                                                     @else
                                                         <span class="badge badge-warning"><span class="ti-clock"></span>Livraison en cours</span>
                                                     @endif
-                                                </td>	
+                                                </td>
                                                 <td>
                                                     <small><strong>{{number_format(round($commandes->sum('montant'),2), 0, ',', ' ')}} FCFA</strong> <br>Pour {{$commandes->sum('qte')}} Ticket(s)</small>
-                                                </td>	
+                                                </td>
                                                 <td><a href="{{route('user.detailstickets',['sessionid'=>$firstcommande->session_id])}}" class="btn btn-fill-out btn-small d-block">Voir</a></td>
-                                                 
+
                                             </tr>
                                             @php
                                                 $i=$i+1;
                                             @endphp
                                         @empty
-                                            
+
                                         @endforelse
                                     </tbody>
                                 </table>
@@ -105,18 +105,18 @@
 		function readURL(input) {
 			if (input.files && input.files[0]) {
 				var reader = new FileReader();
-				
+
 				reader.onload = function (e) {
 					$('#blah1').attr('src', e.target.result);
 				}
-				
+
 				reader.readAsDataURL(input.files[0]);
 			}
 		}
 		function uploadavatar(){
 			$('#cover').trigger('click');
 		}
-		
+
 		$("#cover").change(function(){
 			readURL(this);
 		});

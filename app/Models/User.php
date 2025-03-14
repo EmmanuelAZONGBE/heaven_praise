@@ -53,7 +53,7 @@ class User extends Authenticatable
     {
         return $this->singles()->sum('nombre_ecoutes');
     }
-    
+
 
     public function pays()
     {
@@ -79,4 +79,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Live');
     }
+    public function albums()
+    {
+        return $this->hasMany(Album::class);
+    }
+
 }

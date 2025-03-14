@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Vente;
-use App\Models\Paiementventemster;
 use App\Models\Commande;
 use App\Models\User;
 use App\Models\Evenement;
@@ -20,7 +18,7 @@ class FedapayController extends Controller
     {
         \FedaPay\FedaPay::setApiKey("sk_sandbox_aLE9DLSQKTzCYkAlgdcFnaTU");
         \FedaPay\FedaPay::setEnvironment('sandbox');
-        
+
         $sessionid=Session::get('session_id');
         $commandes=Commande::where('session_id',Session::get('session_id'))->get();
         $user=User::find($commandes->first()->user_id);
@@ -34,7 +32,7 @@ class FedapayController extends Controller
         $firstname=$explode[1];
         $email=$user->email;
         $telephone=$user->telephone;
-        $description="Achat de tickets pour l\'évènement \"".$evenement->titre."\" par ".$user->nom." - Id de la vente : ".$sessionid; 
+        $description="Achat de tickets pour l\'évènement \"".$evenement->titre."\" par ".$user->nom." - Id de la vente : ".$sessionid;
         $transaction = 	\FedaPay\Transaction::create(array(
             "description" => $description,
             "amount" => $total,
@@ -71,7 +69,7 @@ class FedapayController extends Controller
                     'modedepaiement'=>$transaction->mode,
                 ]);
             }
-            
+
             if(Auth::guest()){
                 // récuperer l'utilisateur
                 $user=User::where('sessionid',Session::get('session_id'))->first();
@@ -87,7 +85,7 @@ class FedapayController extends Controller
             Session::forget('session_id');
             return redirect()->route('ordercompleted',['slug'=>$slug,'sessionid'=>$sessionid]);
         }else{
-            \Session::put('error','Paiement Non effectué! Verifiez votre solde sur le moyen de paiement sélectionné puis rééssayez!');
+            Session::put('error','Paiement Non effectué! Verifiez votre solde sur le moyen de paiement sélectionné puis rééssayez!');
             return redirect()->route('checkout',['slug'=>$slug])->with('error','<strong>Oups! Paiement non éffectué.</strong><br> Vérifiez votre moyen de paiement sélectionné puis rééssayez SVP.<br>Merci');
         }
     }

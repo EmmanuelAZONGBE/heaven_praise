@@ -310,7 +310,7 @@
                                     <div class="song-card">
                                         <div class="left-block">
                                             <div class="play">
-                                                <a href="javascript:;" class="joue play-s1" data-id="{{ $single->id }}"
+                                                <a href="javascript:;" class="joue play-s1 track-click" data-id="{{ $single->id }}"
                                                     data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                     data-title="{{ $i }}. {{ $single->titre }}"
@@ -355,6 +355,13 @@
                                                 <span class="tooltip-pop">Partager</span>
                                                 <i class="fa-solid fa-share"></i>
                                             </a>
+                                            <a href="javascript:;" class="action-btn like"
+                                                data-id="{{ $single->id }}">
+                                                <span class="tooltip-pop">J'aime</span>
+                                                <i class="fa-solid fa-heart"></i>
+                                            </a>
+                                            <span class="like-count"
+                                                data-id="{{ $single->id }}">{{ $single->nombre_aimes ?? 0 }}</span>
                                         </div>
                                     </div>
                                     @php $i++; @endphp
@@ -424,6 +431,13 @@
                                                 <span class="tooltip-pop">Partager</span>
                                                 <i class="fa-solid fa-share"></i>
                                             </a>
+                                            <a href="javascript:;" class="action-btn like"
+                                                data-id="{{ $single->id }}">
+                                                <span class="tooltip-pop">J'aime</span>
+                                                <i class="fa-solid fa-heart"></i>
+                                            </a>
+                                            <span class="like-count"
+                                                data-id="{{ $single->id }}">{{ $single->nombre_aimes ?? 0 }}</span>
                                         </div>
                                     </div>
                                     @php $i++; @endphp

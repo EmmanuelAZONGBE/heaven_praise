@@ -30,7 +30,15 @@ class UserController extends Controller
 
     public function index()
     {
-        return view('user.dashboard');
+        $user = auth()->user(); // Récupérer l'utilisateur connecté
+
+        // Récupérer les IDs des singles de l'utilisateur
+        $singles = Single::where('user_id', $user->id)->pluck('id');
+
+        // Calculer la somme des écoutes de tous ses singles
+        $totalEcoutes = Ecoute::whereIn('single_id', $singles)->sum('nombre_ecoutes');
+        $totalClicks = Ecoute::whereIn('single_id', $singles)->sum('nombre_clicks');
+        return view('user.dashboard', compact( 'totalEcoutes','totalClicks'));
     }
 
     public function tracks()
@@ -46,7 +54,18 @@ class UserController extends Controller
 
     public function likes()
     {
-        return view('user.likes');
+        $user = auth()->user()->load('singles.aimes');
+        return view('user.likes', compact('user'));
+    }
+
+    public function souscriptions()
+    {
+        return view('user.souscriptions');
+    }
+
+    public function telechargements()
+    {
+        return view('user.telechargements');
     }
 
     public function parametres()
@@ -185,7 +204,6 @@ class UserController extends Controller
     {
         $tickets = Commande::orderBy('id', 'Desc')->where('user_id', Auth::user()->id)->where('paye', 1)->get()->groupBy('reference');
         $commandes = Commande::where('user_id', Auth::user()->id)->where('paye', 1)->get();
-
         return view('user.tickets', compact('tickets', 'commandes'));
     }
 
@@ -195,6 +213,13 @@ class UserController extends Controller
         $event = Evenement::find($commandes->first()->evenement_id);
         return view('user.detailstickets', compact('commandes', 'event'));
     }
+
+    public function plans()
+    {
+        return view('user.plans');
+    }
+
+    
 
     public function adresselivraison()
     {
@@ -354,6 +379,6 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'L\'album "' . $album->titre . '" a été supprimé avec succès!');
     }
 
-    
+
 
 }

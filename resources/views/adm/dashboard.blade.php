@@ -32,9 +32,9 @@
                         </div>
                         <!-- project number -->
                         <div class="lh-1">
-                            <h1 class=" mb-1 fw-bold">18</h1>
+                            <h1 class=" mb-1 fw-bold">{{ $totalArtistes }}</h1>
                             <p class="mb-0">
-                                <span class="text-dark me-2">2</span>
+                                <span class="text-dark me-2">{{ $totalArtistesActifs }}</span>
                                 Actifs
                             </p>
                         </div>
@@ -57,9 +57,9 @@
                         </div>
                         <!-- project number -->
                         <div class="lh-1">
-                            <h1 class="  mb-1 fw-bold">132</h1>
+                            <h1 class="  mb-1 fw-bold">{{ $totalSingles }}</h1>
                             <p class="mb-0">
-                                <span class="text-dark me-2">28</span>
+                                <span class="text-dark me-2">{{ $totalSinglesOnline }}</span>
                                 En Ligne
                             </p>
                         </div>
@@ -82,9 +82,9 @@
                         </div>
                         <!-- project number -->
                         <div class="lh-1">
-                            <h1 class="  mb-1 fw-bold">12</h1>
+                            <h1 class="  mb-1 fw-bold">{{ $totalAlbums }}</h1>
                             <p class="mb-0">
-                                <span class="text-dark me-2">1</span>
+                                <span class="text-dark me-2">{{ $totalAlbumsOnline }}</span>
                                 En Ligne
                             </p>
                         </div>
@@ -666,7 +666,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            Project Director 
+                                            Project Director
                                         </td>
                                         <td>
                                             Today

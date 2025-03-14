@@ -1,27 +1,25 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Pays;
-use App\Models\Communaute;
-use App\Models\Paroisse;
-use App\Models\Genre;
-use App\Models\Single;
+use App\Models\Actualite;
 use App\Models\Album;
-use App\Models\Forumpays;
+use App\Models\Categorie;
+use App\Models\Communaute;
+use App\Models\Evenement;
 use App\Models\Forumcommunaute;
 use App\Models\Forumparoisse;
-use App\Models\Evenement;
-use App\Models\Actualite;
-use App\Models\User;
+use App\Models\Forumpays;
+use App\Models\Genre;
 use App\Models\Live;
-use App\Models\Categorie;
+use App\Models\Paroisse;
+use App\Models\Pays;
 use App\Models\Promotion;
+use App\Models\Single;
 use App\Models\Ticketevenement;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
 use Intervention\Image\Facades\Image;
 
 class AdminController extends Controller
@@ -35,14 +33,37 @@ class AdminController extends Controller
     // Tableau de Bord
     public function index()
     {
-        return view('adm.dashboard');
+        // Récupérer le total des singles et albums
+        $totalSingles           = Single::count();
+        $totalSinglesRestricted = Single::where('statut', 'Restreint')->count();
+        $totalSinglesOnline     = Single::where('statut', 'En Ligne')->count();
+
+        // Albums en ligne ou restreints
+        $totalAlbumsOnline     = Album::where('statut', 'En Ligne')->count();
+        $totalAlbumsRestricted = Album::where('statut', 'Restreint')->count();
+        $totalAlbums           = Album::whereIn('statut', ['En Ligne', 'Restreint'])->count();
+
+        // Récupérer tous les albums avec leurs statistiques (total écoutes et clics)
+        $albums = Album::with(['singles' => function ($query) {
+            $query->whereIn('statut', ['En Ligne', 'Restreint', 'En Attente']);
+        }])->get();
+
+
+        // Récupérer le nombre d'artistes et d'artistes actifs
+        $totalArtistes       = User::count();
+        $totalArtistesActifs = User::where('valide', 'Actif')->count();
+
+        return view('adm.dashboard', compact(
+            'totalSingles', 'totalSinglesOnline', 'totalAlbums', 'totalAlbumsOnline',
+            'totalArtistesActifs', 'totalArtistes', 'albums', 'totalSinglesRestricted', 'totalAlbumsRestricted'
+        ));
     }
 
     // GESTION PAYS
     public function pays()
     {
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
-        $artistes = User::where('role', 'Artiste')->get();
+        $pays         = Pays::orderBy('libelle', 'Asc')->get();
+        $artistes     = User::where('role', 'Artiste')->get();
         $utilisateurs = User::where('role', 'Auditeur')->get();
         return view('adm.bases.pays.index', compact('pays', 'artistes', 'utilisateurs'));
     }
@@ -50,12 +71,12 @@ class AdminController extends Controller
     public function storepays(Request $req)
     {
         $this->validate($req, [
-            'libelle' => ['required', 'unique:pays'],
+            'libelle'   => ['required', 'unique:pays'],
             'indicatif' => ['required', 'integer', 'unique:pays'],
         ]);
 
         Pays::create([
-            'libelle' => $req->libelle,
+            'libelle'   => $req->libelle,
             'indicatif' => $req->indicatif,
         ]);
         return redirect()->back()->with('success', 'Pays Enrgistré!');
@@ -63,9 +84,9 @@ class AdminController extends Controller
 
     public function editpays($id)
     {
-        $find = Pays::find($id);
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
-        $artistes = User::where('role', 'Artiste')->get();
+        $find         = Pays::find($id);
+        $pays         = Pays::orderBy('libelle', 'Asc')->get();
+        $artistes     = User::where('role', 'Artiste')->get();
         $utilisateurs = User::where('role', 'Auditeur')->get();
         return view('adm.bases.pays.edit', compact('find', 'pays', 'artistes', 'utilisateurs'));
     }
@@ -74,12 +95,12 @@ class AdminController extends Controller
     {
         $find = Pays::find($id);
         $this->validate($req, [
-            'libelle' => 'required|string|unique:pays,libelle,' . $find->id,
+            'libelle'   => 'required|string|unique:pays,libelle,' . $find->id,
             'indicatif' => 'required|integer|unique:pays,indicatif,' . $find->id,
         ]);
 
         Pays::where('id', $id)->update([
-            'libelle' => $req->libelle,
+            'libelle'   => $req->libelle,
             'indicatif' => $req->indicatif,
         ]);
         return redirect()->route('admin.pays')->with('success', 'Pays Modifié!');
@@ -87,7 +108,7 @@ class AdminController extends Controller
 
     public function forumspays($id)
     {
-        $find = Pays::find($id);
+        $find   = Pays::find($id);
         $forums = Forumpays::where('pays_id', $id)->get();
         return view('adm.bases.pays.forums', compact('find', 'forums'));
     }
@@ -95,7 +116,7 @@ class AdminController extends Controller
     {
         $find = Pays::find($id);
         Forumpays::create([
-            'lien' => $req->lien,
+            'lien'    => $req->lien,
             'pays_id' => $id,
         ]);
         return redirect()->back()->with('success', 'Lien de forum enregistré!');
@@ -111,8 +132,8 @@ class AdminController extends Controller
     public function editforumspays($id, $idforum)
     {
         $findforum = Forumpays::find($idforum);
-        $find = Pays::find($findforum->pays_id);
-        $forums = Forumpays::where('pays_id', $id)->get();
+        $find      = Pays::find($findforum->pays_id);
+        $forums    = Forumpays::where('pays_id', $id)->get();
         return view('adm.bases.pays.editforumspays', compact('find', 'findforum', 'forums'));
     }
     public function updateforumspays(request $req, $id, $idforum)
@@ -132,12 +153,11 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Forum supprimé avec succès.');
     }
 
-
     public function destroypays($id)
     {
         $pays = Pays::find($id);
 
-        if (!$pays) {
+        if (! $pays) {
             return redirect()->back()->with('error', 'Pays introuvable.');
         }
 
@@ -147,12 +167,11 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Pays supprimé avec succès.');
     }
 
-
     // GESTION COMMUNAUTE
     public function communaute()
     {
-        $communautes = Communaute::orderBy('libelle', 'Asc')->get();
-        $artistes = User::where('role', 'Artiste')->get();
+        $communautes  = Communaute::orderBy('libelle', 'Asc')->get();
+        $artistes     = User::where('role', 'Artiste')->get();
         $utilisateurs = User::where('role', 'Auditeur')->get();
         return view('adm.bases.communaute.index', compact('communautes', 'artistes', 'utilisateurs'));
     }
@@ -171,9 +190,9 @@ class AdminController extends Controller
 
     public function editcommunaute($id)
     {
-        $find = Communaute::find($id);
-        $communautes = Communaute::orderBy('libelle', 'Asc')->get();
-        $artistes = User::where('role', 'Artiste')->get();
+        $find         = Communaute::find($id);
+        $communautes  = Communaute::orderBy('libelle', 'Asc')->get();
+        $artistes     = User::where('role', 'Artiste')->get();
         $utilisateurs = User::where('role', 'Auditeur')->get();
         return view('adm.bases.communaute.edit', compact('find', 'communautes', 'artistes', 'utilisateurs'));
     }
@@ -193,7 +212,7 @@ class AdminController extends Controller
 
     public function forumscommunaute($id)
     {
-        $find = Communaute::find($id);
+        $find   = Communaute::find($id);
         $forums = Forumcommunaute::where('communaute_id', $id)->get();
         return view('adm.bases.communaute.forums', compact('find', 'forums'));
     }
@@ -201,7 +220,7 @@ class AdminController extends Controller
     {
         $find = Communaute::find($id);
         Forumcommunaute::create([
-            'lien' => $req->lien,
+            'lien'          => $req->lien,
             'communaute_id' => $id,
         ]);
         return redirect()->back()->with('success', 'Lien de forum enregistré!');
@@ -216,8 +235,8 @@ class AdminController extends Controller
     public function editforumscommunaute($id, $idforum)
     {
         $findforum = Forumcommunaute::find($idforum);
-        $find = Communaute::find($findforum->communaute_id);
-        $forums = Forumcommunaute::where('communaute_id', $id)->get();
+        $find      = Communaute::find($findforum->communaute_id);
+        $forums    = Forumcommunaute::where('communaute_id', $id)->get();
         return view('adm.bases.communaute.editforumscommunaute', compact('find', 'findforum', 'forums'));
     }
     public function updateforumscommunaute(request $req, $id, $idforum)
@@ -236,16 +255,13 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Communauté supprimée avec succès.');
     }
 
-
-
-
     // GESTION PAROISSE
     public function paroisse()
     {
-        $paroisses = Paroisse::orderBy('libelle', 'Asc')->get();
-        $communautes = Communaute::orderBy('libelle', 'Asc')->get();
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
-        $artistes = User::where('role', 'Artiste')->get();
+        $paroisses    = Paroisse::orderBy('libelle', 'Asc')->get();
+        $communautes  = Communaute::orderBy('libelle', 'Asc')->get();
+        $pays         = Pays::orderBy('libelle', 'Asc')->get();
+        $artistes     = User::where('role', 'Artiste')->get();
         $utilisateurs = User::where('role', 'Auditeur')->get();
         return view('adm.bases.paroisse.index', compact('paroisses', 'artistes', 'utilisateurs', 'communautes', 'pays'));
     }
@@ -253,14 +269,14 @@ class AdminController extends Controller
     public function storeparoisse(Request $req)
     {
         $this->validate($req, [
-            'libelle' => ['required', 'unique:paroisses'],
-            'pays' => ['required'],
+            'libelle'    => ['required', 'unique:paroisses'],
+            'pays'       => ['required'],
             'communaute' => ['required'],
         ]);
 
         Paroisse::create([
-            'libelle' => $req->libelle,
-            'pays_id' => $req->pays,
+            'libelle'       => $req->libelle,
+            'pays_id'       => $req->pays,
             'communaute_id' => $req->communaute,
         ]);
         return redirect()->back()->with('success', 'Paroisse Enrgistrée!');
@@ -268,11 +284,11 @@ class AdminController extends Controller
 
     public function editparoisse($id)
     {
-        $find = Paroisse::find($id);
-        $paroisses = Paroisse::orderBy('libelle', 'Asc')->get();
-        $communautes = Communaute::orderBy('libelle', 'Asc')->get();
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
-        $artistes = User::where('role', 'Artiste')->get();
+        $find         = Paroisse::find($id);
+        $paroisses    = Paroisse::orderBy('libelle', 'Asc')->get();
+        $communautes  = Communaute::orderBy('libelle', 'Asc')->get();
+        $pays         = Pays::orderBy('libelle', 'Asc')->get();
+        $artistes     = User::where('role', 'Artiste')->get();
         $utilisateurs = User::where('role', 'Auditeur')->get();
         return view('adm.bases.paroisse.edit', compact('find', 'paroisses', 'pays', 'communautes', 'artistes', 'utilisateurs'));
     }
@@ -281,14 +297,14 @@ class AdminController extends Controller
     {
         $find = Paroisse::find($id);
         $this->validate($req, [
-            'libelle' => 'required|string|unique:paroisses,libelle,' . $find->id,
-            'pays' => ['required'],
+            'libelle'    => 'required|string|unique:paroisses,libelle,' . $find->id,
+            'pays'       => ['required'],
             'communaute' => ['required'],
         ]);
 
         Paroisse::where('id', $id)->update([
-            'libelle' => $req->libelle,
-            'pays_id' => $req->pays,
+            'libelle'       => $req->libelle,
+            'pays_id'       => $req->pays,
             'communaute_id' => $req->communaute,
         ]);
         return redirect()->route('admin.paroisse')->with('success', 'Paroisse Modifiée!');
@@ -296,7 +312,7 @@ class AdminController extends Controller
 
     public function forumsparoisse($id)
     {
-        $find = Paroisse::find($id);
+        $find   = Paroisse::find($id);
         $forums = Forumparoisse::where('paroisse_id', $id)->get();
         return view('adm.bases.paroisse.forums', compact('find', 'forums'));
     }
@@ -304,7 +320,7 @@ class AdminController extends Controller
     {
         $find = Paroisse::find($id);
         Forumparoisse::create([
-            'lien' => $req->lien,
+            'lien'        => $req->lien,
             'paroisse_id' => $id,
         ]);
         return redirect()->back()->with('success', 'Lien de forum enregistré!');
@@ -319,8 +335,8 @@ class AdminController extends Controller
     public function editforumsparoisse($id, $idforum)
     {
         $findforum = Forumparoisse::find($idforum);
-        $find = Paroisse::find($findforum->paroisse_id);
-        $forums = Forumparoisse::where('paroisse_id', $id)->get();
+        $find      = Paroisse::find($findforum->paroisse_id);
+        $forums    = Forumparoisse::where('paroisse_id', $id)->get();
         return view('adm.bases.paroisse.editforumsparoisse', compact('find', 'findforum', 'forums'));
     }
     public function updateforumsparoisse(request $req, $id, $idforum)
@@ -336,7 +352,7 @@ class AdminController extends Controller
     {
         $paroisse = Paroisse::find($id);
 
-        if (!$paroisse) {
+        if (! $paroisse) {
             return redirect()->back()->with('error', 'Paroisse introuvable.');
         }
 
@@ -353,7 +369,7 @@ class AdminController extends Controller
     {
         $forum = Forumparoisse::find($id);
 
-        if (!$forum) {
+        if (! $forum) {
             return redirect()->back()->with('error', 'Forum introuvable.');
         }
 
@@ -363,12 +379,10 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Forum supprimé avec succès.');
     }
 
-
-
     // GESTION GENRE
     public function genre()
     {
-        $genres = Genre::orderBy('libelle', 'Asc')->get();
+        $genres  = Genre::orderBy('libelle', 'Asc')->get();
         $singles = Single::orderBy('id', 'Desc')->where('masque', 0)->where('statut', 'En Ligne')->get();
         return view('adm.bases.genre.index', compact('genres', 'singles'));
     }
@@ -377,20 +391,20 @@ class AdminController extends Controller
     {
         $this->validate($req, [
             'libelle' => ['required', 'unique:genres'],
-            'slug' => ['required', 'unique:genres'],
+            'slug'    => ['required', 'unique:genres'],
         ]);
 
         Genre::create([
             'libelle' => $req->libelle,
-            'slug' => $req->slug,
+            'slug'    => $req->slug,
         ]);
         return redirect()->back()->with('success', 'Genre Enrgistré!');
     }
 
     public function editgenre($id)
     {
-        $find = Genre::find($id);
-        $genres = Genre::orderBy('libelle', 'Asc')->get();
+        $find    = Genre::find($id);
+        $genres  = Genre::orderBy('libelle', 'Asc')->get();
         $singles = Single::orderBy('id', 'Desc')->where('masque', 0)->where('statut', 'En Ligne')->get();
         return view('adm.bases.genre.edit', compact('find', 'genres', 'singles'));
     }
@@ -400,12 +414,12 @@ class AdminController extends Controller
         $find = Genre::find($id);
         $this->validate($req, [
             'libelle' => 'required|string|unique:genres,libelle,' . $find->id,
-            'slug' => 'required|string|unique:genres,slug,' . $find->id,
+            'slug'    => 'required|string|unique:genres,slug,' . $find->id,
         ]);
 
         Genre::where('id', $id)->update([
             'libelle' => $req->libelle,
-            'slug' => $req->slug,
+            'slug'    => $req->slug,
         ]);
         return redirect()->route('admin.genre')->with('success', 'Genre Modifiée!');
     }
@@ -414,18 +428,15 @@ class AdminController extends Controller
     {
         $genre = Genre::find($id);
 
-        if (!$genre) {
+        if (! $genre) {
             return redirect()->back()->with('error', 'Genre introuvable.');
         }
-
 
         // Suppression du genre
         $genre->delete();
 
         return redirect()->back()->with('success', 'Genre supprimé avec succès.');
     }
-
-
 
     // GESTION PROMOTIONS
     public function promotion()
@@ -445,37 +456,37 @@ class AdminController extends Controller
         // dd($req->all());
         $this->validate($req, [
             'destination' => ['required'],
-            'position' => ['required'],
-            'lien' => ['required_if:destination,Externe'],
-            'actualite' => ['required_if:destination,==,Actualité'],
-            'evenement' => ['required_if:destination,==,Évènement'],
-            'banniere' => ['required'],
+            'position'    => ['required'],
+            'lien'        => ['required_if:destination,Externe'],
+            'actualite'   => ['required_if:destination,==,Actualité'],
+            'evenement'   => ['required_if:destination,==,Évènement'],
+            'banniere'    => ['required'],
         ]);
 
         if ($req->destination == "Externe") {
-            $lien = $req->lien;
+            $lien      = $req->lien;
             $actualite = "";
             $evenement = "";
         }
         if ($req->destination == "Actualité") {
-            $lien = "";
+            $lien      = "";
             $actualite = $req->actualite;
-            $evenement = NULL;
+            $evenement = null;
         }
         if ($req->destination == "Évènement") {
-            $lien = "";
-            $actualite = NULL;
+            $lien      = "";
+            $actualite = null;
             $evenement = $req->evenement;
         }
 
-        $time = time();
-        $photo = $req->banniere;
+        $time    = time();
+        $photo   = $req->banniere;
         $imgname = $time . "1" . '.' . $photo->getClientOriginalExtension();
-        $img = Image::make($photo)->save(public_path('usx_files/promotions/' . $imgname));
+        $img     = Image::make($photo)->save(public_path('usx_files/promotions/' . $imgname));
         Promotion::create([
-            'position' => $req->position,
-            'banniere' => $imgname,
-            'lien' => $lien,
+            'position'     => $req->position,
+            'banniere'     => $imgname,
+            'lien'         => $lien,
             'actualite_id' => $actualite,
             'evenement_id' => $evenement,
         ]);
@@ -486,7 +497,7 @@ class AdminController extends Controller
     {
         $promotion = Promotion::find($id);
 
-        if (!$promotion) {
+        if (! $promotion) {
             return redirect()->back()->with('error', 'Promotion introuvable.');
         }
 
@@ -501,7 +512,6 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Promotion supprimée avec succès.');
     }
 
-
     // GESTION CATEGORIE
     public function categorie()
     {
@@ -513,19 +523,19 @@ class AdminController extends Controller
     {
         $this->validate($req, [
             'libelle' => ['required', 'unique:categories'],
-            'slug' => ['required', 'unique:categories'],
+            'slug'    => ['required', 'unique:categories'],
         ]);
 
         Categorie::create([
             'libelle' => $req->libelle,
-            'slug' => $req->slug,
+            'slug'    => $req->slug,
         ]);
         return redirect()->back()->with('success', 'Categorie Enregistrée!');
     }
 
     public function editcategorie($id)
     {
-        $find = Categorie::find($id);
+        $find       = Categorie::find($id);
         $categories = Categorie::orderBy('libelle', 'Asc')->get();
         return view('adm.bases.categorie.edit', compact('find', 'categories'));
     }
@@ -535,12 +545,12 @@ class AdminController extends Controller
         $find = Genre::find($id);
         $this->validate($req, [
             'libelle' => 'required|string|unique:categories,libelle,' . $find->id,
-            'slug' => 'required|string|unique:categories,slug,' . $find->id,
+            'slug'    => 'required|string|unique:categories,slug,' . $find->id,
         ]);
 
         Categorie::where('id', $id)->update([
             'libelle' => $req->libelle,
-            'slug' => $req->slug,
+            'slug'    => $req->slug,
         ]);
         return redirect()->route('admin.categorie')->with('success', 'Categorie Modifiée!');
     }
@@ -553,7 +563,6 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Catégorie supprimée avec succès.');
     }
 
-
     // GESTION DES ARTISTES
 
     public function createartists()
@@ -565,11 +574,11 @@ class AdminController extends Controller
     {
 
         $this->validate($req, [
-            'nom' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'pays' => 'required',
+            'nom'           => 'required|string|max:255',
+            'email'         => 'required|string|email|max:255|unique:users',
+            'pays'          => 'required',
             'nom_d_artiste' => 'required|string',
-            'mot_de_passe' => 'required|string|min:6|confirmed',
+            'mot_de_passe'  => 'required|string|min:6|confirmed',
         ]);
 
         $getheavenid = User::orderBy('id', 'Desc')->first();
@@ -579,13 +588,13 @@ class AdminController extends Controller
             $heavenid = $getheavenid->heavenid + 1;
         }
         User::create([
-            'heavenid' => $heavenid,
-            'nom' => $req->nom,
+            'heavenid'   => $heavenid,
+            'nom'        => $req->nom,
             'nomartiste' => $req->nom_d_artiste,
-            'email' => $req->email,
-            'role' => "Artiste",
-            'pays_id' => $req->pays,
-            'password' => Hash::make($req->mot_de_passe),
+            'email'      => $req->email,
+            'role'       => "Artiste",
+            'pays_id'    => $req->pays,
+            'password'   => Hash::make($req->mot_de_passe),
         ]);
         return redirect()->back()->with('success', 'L\'artiste <strong>"' . $req->nom . '"</strong> a été inscrit avec succès!<br> Veuillez valider le compte pour poursuivre.');
     }
@@ -609,9 +618,9 @@ class AdminController extends Controller
 
     public function vueartist($id)
     {
-        $find = User::find($id);
-        $singles = Single::where('album_id', NULL)->where('user_id', $id)->get();
-        $albums = Album::where('user_id', $id)->get();
+        $find    = User::find($id);
+        $singles = Single::where('album_id', null)->where('user_id', $id)->get();
+        $albums  = Album::where('user_id', $id)->get();
         return view('adm.artistes.vueglobale', compact('find', 'singles', 'albums'));
     }
 
@@ -659,7 +668,7 @@ class AdminController extends Controller
     {
         $artiste = User::find($id);
 
-        if (!$artiste) {
+        if (! $artiste) {
             return redirect()->back()->with('error', 'Artiste introuvable.');
         }
 
@@ -673,8 +682,6 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Artiste supprimé avec succès.');
     }
-
-
 
     // GESTION DES SINGLES
     public function singles()
@@ -752,7 +759,7 @@ class AdminController extends Controller
     {
         $single = Single::find($id);
 
-        if (!$single) {
+        if (! $single) {
             return redirect()->back()->with('error', 'Single introuvable.');
         }
 
@@ -764,44 +771,45 @@ class AdminController extends Controller
     // GESTION DES ALBUMS
     public function albums()
     {
-        $albums = Album::where('statut', 'En Ligne')->get();
-        $titre = "Albums";
+        $albums    = Album::where('statut', 'En Ligne')->get();
+        $titre     = "Albums";
         $desctable = "Liste des Albums en ligne";
         return view('adm.albums.list', compact('titre', 'albums', 'desctable'));
     }
     public function newalbums()
     {
-        $albums = Album::where('statut', 'En Attente')->get();
-        $titre = "Nouveaux Albums";
+        $albums    = Album::where('statut', 'En Attente')->get();
+        $titre     = "Nouveaux Albums";
         $desctable = "Liste des Albums publiés récemment";
         return view('adm.albums.list', compact('titre', 'albums', 'desctable'));
     }
     public function restrictedalbums()
     {
-        $albums = Album::where('statut', 'Restreint')->get();
-        $titre = "Albums Restreints";
+        $albums    = Album::where('statut', 'Restreint')->get();
+        $titre     = "Albums Restreints";
         $desctable = "Liste des Albums restreints sur Heavenly Praise";
         return view('adm.albums.list', compact('titre', 'albums', 'desctable'));
     }
     public function visiblesalbums()
     {
-        $albums = Album::where('masque', 0)->get();
-        $titre = "Albums Non Masqués";
+        $albums    = Album::where('masque', 0)->get();
+        $titre     = "Albums Non Masqués";
         $desctable = "Liste des Albums visibles par les auditeurs";
         return view('adm.albums.list', compact('titre', 'albums', 'desctable'));
     }
     public function maskedalbums()
     {
-        $albums = Album::where('masque', 1)->get();
-        $titre = "Albums Masqués";
+        $albums    = Album::where('masque', 1)->get();
+        $titre     = "Albums Masqués";
         $desctable = "Liste des Albums non visibles par les auditeurs";
         return view('adm.albums.list', compact('titre', 'albums', 'desctable'));
     }
     public function detailsalbum($id)
     {
-        $find = Album::find($id);
+        $find    = Album::find($id);
+        $album   = Album::find($id);
         $singles = Single::where('album_id', $id)->get();
-        return view('adm.albums.details', compact('find', 'singles'));
+        return view('adm.albums.details', compact('find', 'singles', 'album'));
     }
     public function validatealbum($id)
     {
@@ -853,7 +861,7 @@ class AdminController extends Controller
     {
         $album = Album::find($id);
 
-        if (!$album) {
+        if (! $album) {
             return redirect()->back()->with('error', 'Album introuvable.');
         }
 
@@ -863,41 +871,39 @@ class AdminController extends Controller
             unlink($imagePath);
         }
 
-
         $album->delete();
 
         return redirect()->back()->with('success', 'Album supprimé avec succès.');
     }
 
-
     //GESTION DES EVENEMENTS
     public function listevents()
     {
-        $events = Evenement::get();
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
+        $events     = Evenement::get();
+        $pays       = Pays::orderBy('libelle', 'Asc')->get();
         $categories = Categorie::orderBy('libelle', 'Asc')->get();
         return view('adm.evenements.list', compact('events', 'pays', 'categories'));
     }
     public function newevents()
     {
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
+        $pays       = Pays::orderBy('libelle', 'Asc')->get();
         $categories = Categorie::orderBy('libelle', 'Asc')->get();
         return view('adm.evenements.create', compact('pays', 'categories'));
     }
     public function storeevents(Request $req)
     {
         $this->validate($req, [
-            'titre' => 'required|unique:evenements',
-            'slug' => 'required|unique:evenements',
+            'titre'       => 'required|unique:evenements',
+            'slug'        => 'required|unique:evenements',
             'description' => 'required',
-            'banniere' => 'required|file|mimes:jpg,png,svg,jpeg|dimensions:width=1920,height=1280',
-            'statut' => 'required',
-            'gratuit' => 'required',
-            'billeterie' => 'nullable',
-            'lieu' => 'required',
-            'pays' => 'required',
-            'categorie' => 'required',
-            'date' => 'required|date|after:today',
+            'banniere'    => 'required|file|mimes:jpg,png,svg,jpeg|dimensions:width=1920,height=1280',
+            'statut'      => 'required',
+            'gratuit'     => 'required',
+            'billeterie'  => 'nullable',
+            'lieu'        => 'required',
+            'pays'        => 'required',
+            'categorie'   => 'required',
+            'date'        => 'required|date|after:today',
         ]);
         if (empty($req->billeterie)) {
             $billeterie = 0;
@@ -909,23 +915,23 @@ class AdminController extends Controller
         } else {
             $flash = 1;
         }
-        $time = time();
-        $photo = $req->banniere;
+        $time    = time();
+        $photo   = $req->banniere;
         $imgname = $time . "1" . '.' . $photo->getClientOriginalExtension();
-        $img = Image::make($photo)->save(public_path('usx_files/events/' . $imgname));
+        $img     = Image::make($photo)->save(public_path('usx_files/events/' . $imgname));
         Evenement::create([
-            'titre' => $req->titre,
-            'slug' => $req->slug,
-            'description' => $req->description,
-            'statut' => $req->statut,
-            'gratuit' => $req->gratuit,
-            'flash' => $flash,
-            'billeterie' => $billeterie,
-            'lieu' => $req->lieu,
-            'date' => $req->date,
-            'banniere' => $imgname,
-            'user_id' => Auth::user()->id,
-            'pays_id' => $req->pays,
+            'titre'        => $req->titre,
+            'slug'         => $req->slug,
+            'description'  => $req->description,
+            'statut'       => $req->statut,
+            'gratuit'      => $req->gratuit,
+            'flash'        => $flash,
+            'billeterie'   => $billeterie,
+            'lieu'         => $req->lieu,
+            'date'         => $req->date,
+            'banniere'     => $imgname,
+            'user_id'      => Auth::user()->id,
+            'pays_id'      => $req->pays,
             'categorie_id' => $req->categorie,
         ]);
         return redirect()->back()->with('success', 'L\'évènement <strong>"' . $req->titre . '"</strong> a été publié avec succès!');
@@ -946,8 +952,8 @@ class AdminController extends Controller
     }
     public function editevents($id)
     {
-        $find = Evenement::find($id);
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
+        $find       = Evenement::find($id);
+        $pays       = Pays::orderBy('libelle', 'Asc')->get();
         $categories = Categorie::orderBy('libelle', 'Asc')->get();
         // dd($find);
         return view('adm.evenements.edit', compact('find', 'pays', 'categories'));
@@ -956,16 +962,16 @@ class AdminController extends Controller
     {
         $find = Evenement::find($id);
         $this->validate($req, [
-            'titre' => 'required|string|unique:evenements,titre,' . $find->id,
-            'slug' => 'required|string|unique:evenements,slug,' . $find->id,
+            'titre'       => 'required|string|unique:evenements,titre,' . $find->id,
+            'slug'        => 'required|string|unique:evenements,slug,' . $find->id,
             'description' => 'required',
-            'banniere' => 'nullable|file|mimes:jpg,png,svg,jpeg|dimensions:width=1920,height=1280',
-            'statut' => 'required',
-            'gratuit' => 'required',
-            'billeterie' => 'nullable',
-            'lieu' => 'required',
-            'pays' => 'required',
-            'categorie' => 'required',
+            'banniere'    => 'nullable|file|mimes:jpg,png,svg,jpeg|dimensions:width=1920,height=1280',
+            'statut'      => 'required',
+            'gratuit'     => 'required',
+            'billeterie'  => 'nullable',
+            'lieu'        => 'required',
+            'pays'        => 'required',
+            'categorie'   => 'required',
             // 'date' =>  'required|date|after:today',
         ]);
         if (empty($req->billeterie)) {
@@ -978,26 +984,26 @@ class AdminController extends Controller
         } else {
             $flash = 1;
         }
-        if (!empty($req->banniere)) {
-            $time = time();
-            $photo = $req->banniere;
+        if (! empty($req->banniere)) {
+            $time    = time();
+            $photo   = $req->banniere;
             $imgname = $time . "1" . '.' . $photo->getClientOriginalExtension();
-            $img = Image::make($photo)->save(public_path('usx_files/events/' . $imgname));
+            $img     = Image::make($photo)->save(public_path('usx_files/events/' . $imgname));
         } else {
             $imgname = $find->banniere;
         }
         Evenement::where('id', $id)->update([
-            'titre' => $req->titre,
-            'slug' => $req->slug,
-            'description' => $req->description,
-            'statut' => $req->statut,
-            'gratuit' => $req->gratuit,
-            'flash' => $flash,
-            'billeterie' => $billeterie,
-            'lieu' => $req->lieu,
-            'date' => $req->date,
-            'banniere' => $imgname,
-            'pays_id' => $req->pays,
+            'titre'        => $req->titre,
+            'slug'         => $req->slug,
+            'description'  => $req->description,
+            'statut'       => $req->statut,
+            'gratuit'      => $req->gratuit,
+            'flash'        => $flash,
+            'billeterie'   => $billeterie,
+            'lieu'         => $req->lieu,
+            'date'         => $req->date,
+            'banniere'     => $imgname,
+            'pays_id'      => $req->pays,
             'categorie_id' => $req->categorie,
         ]);
         return redirect()->route('admin.listevents')->with('success', 'L\'évènement <strong>"' . $req->titre . '"</strong> a été modifié avec succès!');
@@ -1005,7 +1011,7 @@ class AdminController extends Controller
 
     public function billeterieevents($id)
     {
-        $event = Evenement::find($id);
+        $event   = Evenement::find($id);
         $tickets = Ticketevenement::where('evenement_id', $id)->get();
         return view('adm.evenements.billeterieevents', compact('event', 'tickets'));
     }
@@ -1013,13 +1019,13 @@ class AdminController extends Controller
     {
         $this->validate($req, [
             'libelle' => 'required',
-            'prix' => 'required',
-            'nombre' => 'required',
+            'prix'    => 'required',
+            'nombre'  => 'required',
         ]);
         Ticketevenement::create([
-            'libelle' => $req->libelle,
-            'prix' => $req->prix,
-            'nombre' => $req->nombre,
+            'libelle'      => $req->libelle,
+            'prix'         => $req->prix,
+            'nombre'       => $req->nombre,
             'evenement_id' => $id,
         ]);
         return redirect()->back()->with('success', 'Le tiket <strong>"' . $req->libelle . '"</strong> a été publié avec succès!');
@@ -1029,7 +1035,7 @@ class AdminController extends Controller
     {
         $event = Evenement::find($id);
 
-        if (!$event) {
+        if (! $event) {
             return redirect()->back()->with('error', 'Événement introuvable.');
         }
 
@@ -1037,7 +1043,6 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Événement supprimé avec succès.');
     }
-
 
     //GESTION DES ACTUALITES
     public function listactus()
@@ -1047,25 +1052,25 @@ class AdminController extends Controller
     }
     public function newactus()
     {
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
+        $pays       = Pays::orderBy('libelle', 'Asc')->get();
         $categories = Categorie::orderBy('libelle', 'Asc')->get();
         return view('adm.actualites.create', compact('pays', 'categories'));
     }
     public function storeactus(Request $req)
     {
         $this->validate($req, [
-            'titre' => 'required|unique:actualites',
-            'slug' => 'required|unique:actualites',
-            'details' => 'required',
-            'banniere' => 'required|file|mimes:jpg,png,svg,jpeg|dimensions:width=1280,height=700',
-            'statut' => 'required',
-            'pays' => 'required',
+            'titre'     => 'required|unique:actualites',
+            'slug'      => 'required|unique:actualites',
+            'details'   => 'required',
+            'banniere'  => 'required|file|mimes:jpg,png,svg,jpeg|dimensions:width=1280,height=700',
+            'statut'    => 'required',
+            'pays'      => 'required',
             'categorie' => 'required',
         ]);
-        $time = time();
-        $photo = $req->banniere;
+        $time    = time();
+        $photo   = $req->banniere;
         $imgname = $time . "1" . '.' . $photo->getClientOriginalExtension();
-        $img = Image::make($photo)->save(public_path('usx_files/actus/' . $imgname));
+        $img     = Image::make($photo)->save(public_path('usx_files/actus/' . $imgname));
         if ($req->statut == 0) {
             $publie = 0;
         } else {
@@ -1078,14 +1083,14 @@ class AdminController extends Controller
             $flash = 1;
         }
         Actualite::create([
-            'titre' => $req->titre,
-            'slug' => $req->slug,
-            'details' => $req->details,
-            'publie' => $publie,
-            'banniere' => $imgname,
-            'flash' => $flash,
-            'user_id' => Auth::user()->id,
-            'pays_id' => $req->pays,
+            'titre'        => $req->titre,
+            'slug'         => $req->slug,
+            'details'      => $req->details,
+            'publie'       => $publie,
+            'banniere'     => $imgname,
+            'flash'        => $flash,
+            'user_id'      => Auth::user()->id,
+            'pays_id'      => $req->pays,
             'categorie_id' => $req->categorie,
         ]);
         return redirect()->back()->with('success', 'L\'actualité <strong>"' . $req->titre . '"</strong> a été publié avec succès!');
@@ -1106,8 +1111,8 @@ class AdminController extends Controller
     }
     public function editactus($id)
     {
-        $find = Actualite::find($id);
-        $pays = Pays::orderBy('libelle', 'Asc')->get();
+        $find       = Actualite::find($id);
+        $pays       = Pays::orderBy('libelle', 'Asc')->get();
         $categories = Categorie::orderBy('libelle', 'Asc')->get();
         return view('adm.actualites.edit', compact('find', 'pays', 'categories'));
     }
@@ -1115,12 +1120,12 @@ class AdminController extends Controller
     {
         $find = Actualite::find($id);
         $this->validate($req, [
-            'titre' => 'required|string|unique:actualites,titre,' . $find->id,
-            'slug' => 'required|string|unique:actualites,slug,' . $find->id,
-            'details' => 'required',
-            'banniere' => 'nullable|file|mimes:jpg,png,svg,jpeg|dimensions:width=1280,height=700',
-            'statut' => 'required',
-            'pays' => 'required',
+            'titre'     => 'required|string|unique:actualites,titre,' . $find->id,
+            'slug'      => 'required|string|unique:actualites,slug,' . $find->id,
+            'details'   => 'required',
+            'banniere'  => 'nullable|file|mimes:jpg,png,svg,jpeg|dimensions:width=1280,height=700',
+            'statut'    => 'required',
+            'pays'      => 'required',
             'categorie' => 'required',
         ]);
         if ($req->statut == 0) {
@@ -1135,23 +1140,23 @@ class AdminController extends Controller
         } else {
             $flash = 1;
         }
-        if (!empty($req->banniere)) {
-            $time = time();
-            $photo = $req->banniere;
+        if (! empty($req->banniere)) {
+            $time    = time();
+            $photo   = $req->banniere;
             $imgname = $time . "1" . '.' . $photo->getClientOriginalExtension();
-            $img = Image::make($photo)->save(public_path('usx_files/actus/' . $imgname));
+            $img     = Image::make($photo)->save(public_path('usx_files/actus/' . $imgname));
         } else {
             $imgname = $find->banniere;
         }
 
         Actualite::where('id', $id)->update([
-            'titre' => $req->titre,
-            'slug' => $req->slug,
-            'details' => $req->details,
-            'publie' => $publie,
-            'banniere' => $imgname,
-            'flash' => $flash,
-            'pays_id' => $req->pays,
+            'titre'        => $req->titre,
+            'slug'         => $req->slug,
+            'details'      => $req->details,
+            'publie'       => $publie,
+            'banniere'     => $imgname,
+            'flash'        => $flash,
+            'pays_id'      => $req->pays,
             'categorie_id' => $req->categorie,
         ]);
         return redirect()->route('admin.listactus')->with('success', 'L\'actualite <strong>"' . $req->titre . '"</strong> a été modifié avec succès!');
@@ -1168,7 +1173,7 @@ class AdminController extends Controller
     //GESTION DES LIVES
     public function listlives()
     {
-        $lives = Live::get();
+        $lives    = Live::get();
         $artistes = User::where('role', 'Artiste')->where('valide', 'oui')->get();
         return view('adm.lives.list', compact('lives', 'artistes'));
     }
@@ -1181,24 +1186,24 @@ class AdminController extends Controller
     {
 
         $this->validate($req, [
-            'titre' => 'required',
-            'lien' => 'required',
-            'artiste' => 'nullable',
+            'titre'    => 'required',
+            'lien'     => 'required',
+            'artiste'  => 'nullable',
             'en_cours' => 'required',
-            'publie' => 'required',
+            'publie'   => 'required',
             'banniere' => 'required|file|mimes:jpg,png,svg,jpeg|dimensions:width=500,height=340',
         ]);
-        $time = time();
-        $photo = $req->banniere;
+        $time    = time();
+        $photo   = $req->banniere;
         $imgname = $time . "1" . '.' . $photo->getClientOriginalExtension();
-        $img = Image::make($photo)->save(public_path('PlayerTemplate/img/live/' . $imgname));
+        $img     = Image::make($photo)->save(public_path('PlayerTemplate/img/live/' . $imgname));
         Live::create([
-            'titre' => $req->titre,
-            'lien' => $req->lien,
-            'publie' => $req->publie,
-            'encours' => $req->en_cours,
+            'titre'    => $req->titre,
+            'lien'     => $req->lien,
+            'publie'   => $req->publie,
+            'encours'  => $req->en_cours,
             'banniere' => $imgname,
-            'user_id' => $req->artiste,
+            'user_id'  => $req->artiste,
         ]);
         return redirect()->back()->with('success', 'La vidéo <strong>"' . $req->titre . '"</strong> a été publié avec succès!');
     }
@@ -1218,7 +1223,7 @@ class AdminController extends Controller
     }
     public function editlives($id)
     {
-        $find = Live::find($id);
+        $find     = Live::find($id);
         $artistes = User::where('role', 'Artiste')->where('valide', 'oui')->get();
         return view('adm.lives.edit', compact('find', 'artistes'));
     }
@@ -1226,28 +1231,28 @@ class AdminController extends Controller
     {
         $find = Live::find($id);
         $this->validate($req, [
-            'titre' => 'required|string|unique:lives,titre,' . $find->id,
-            'lien' => 'required|string|unique:lives,lien,' . $find->id,
+            'titre'    => 'required|string|unique:lives,titre,' . $find->id,
+            'lien'     => 'required|string|unique:lives,lien,' . $find->id,
             'banniere' => 'nullable|file|mimes:jpg,png,svg,jpeg|dimensions:width=1280,height=700',
-            'artiste' => 'nullable',
+            'artiste'  => 'nullable',
             'en_cours' => 'required',
-            'publie' => 'required',
+            'publie'   => 'required',
         ]);
-        if (!empty($req->banniere)) {
-            $time = time();
-            $photo = $req->banniere;
+        if (! empty($req->banniere)) {
+            $time    = time();
+            $photo   = $req->banniere;
             $imgname = $time . "1" . '.' . $photo->getClientOriginalExtension();
-            $img = Image::make($photo)->save(public_path('PlayerTemplate/img/live/' . $imgname));
+            $img     = Image::make($photo)->save(public_path('PlayerTemplate/img/live/' . $imgname));
         } else {
             $imgname = $find->banniere;
         }
         Live::where('id', $id)->update([
-            'titre' => $req->titre,
-            'lien' => $req->lien,
-            'publie' => $req->publie,
-            'encours' => $req->en_cours,
+            'titre'    => $req->titre,
+            'lien'     => $req->lien,
+            'publie'   => $req->publie,
+            'encours'  => $req->en_cours,
             'banniere' => $imgname,
-            'user_id' => $req->artiste,
+            'user_id'  => $req->artiste,
         ]);
         return redirect()->route('admin.listlives')->with('success', 'La vidéo <strong>"' . $req->titre . '"</strong> a été modifié avec succès!');
     }
@@ -1256,7 +1261,7 @@ class AdminController extends Controller
     {
         $live = Live::find($id);
 
-        if (!$live) {
+        if (! $live) {
             return redirect()->back()->with('error', 'Live introuvable.');
         }
 
@@ -1264,6 +1269,5 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Live supprimé avec succès.');
     }
-
 
 }

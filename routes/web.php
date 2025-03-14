@@ -10,11 +10,22 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/', function () {
+    return view('welcome');
+});
+Route::post('/toggle-like', [App\Http\Controllers\GuestController::class, 'toggleLike'])->name('toggleLike');
+Route::post('/clicker-cliks', [App\Http\Controllers\GuestController::class, 'clickerCliks'])->name('clickerCliks');
 Route::get('/', [App\Http\Controllers\GuestController::class, 'index'])->name('welcome');
 Route::get('/get-updated-sections', [App\Http\Controllers\GuestController::class, 'getUpdatedSections']);
 Route::post('/ecouter-chanson', [App\Http\Controllers\GuestController::class, 'ecouterChanson'])->name('ecouterChanson');
 Route::get('/checkout-login', [App\Http\Controllers\GuestController::class, 'index'])->name('checkoutloginindex');
 Route::post('/checkout-login', [App\Http\Controllers\GuestController::class, 'checkoutlogin'])->name('checkoutlogin');
+Route::get('/plans', [App\Http\Controllers\GuestController::class, 'plans'])->name('plans');
+Route::get('/details_basique', [App\Http\Controllers\GuestController::class, 'details_basique'])->name('details_basique');
+Route::get('/details_standard', [App\Http\Controllers\GuestController::class, 'details_standard'])->name('details_standard');
+Route::get('/details_premiun', [App\Http\Controllers\GuestController::class, 'details_premiun'])->name('details_premiun');
+
+
 
 Route::post('/addtoplaylist', [App\Http\Controllers\GuestController::class, 'addtoplaylist'])->name('addtoplaylist');
 
@@ -47,7 +58,6 @@ Route::group(['prefix' => 'evenements/{slug}/'], function () {
     Route::get('/checkout', [App\Http\Controllers\GuestController::class, 'checkout'])->name('checkout');
     Route::post('/checkout', [App\Http\Controllers\GuestController::class, 'storecheckout'])->name('storecheckout');
 
-
     Route::get('/payer', [App\Http\Controllers\FedapayController::class, 'pay'])->name('paywithfedapay');
     Route::get('/paiement-statuts', [App\Http\Controllers\FedapayController::class, 'checkstatus'])->name('fedapaypaiementstatus');
 
@@ -60,7 +70,6 @@ Route::group(['prefix' => 'evenements/{slug}/'], function () {
 
 Route::group(['prefix' => 'tabeau-de-bord/'], function () {
 
-
     Route::get('/', [App\Http\Controllers\UserController::class, 'index'])->name('user.dashboard');
 
     Route::get('/tracks', [App\Http\Controllers\UserController::class, 'tracks'])->name('user.tracks');
@@ -69,6 +78,10 @@ Route::group(['prefix' => 'tabeau-de-bord/'], function () {
 
     Route::get('/likes', [App\Http\Controllers\UserController::class, 'likes'])->name('user.likes');
 
+    Route::get('/souscriptions', [App\Http\Controllers\UserController::class, 'souscriptions'])->name('user.souscriptions');
+
+    Route::get('/telechargements', [App\Http\Controllers\UserController::class, 'telechargements'])->name('user.telechargements');
+
     Route::get('/parametres', [App\Http\Controllers\UserController::class, 'parametres'])->name('user.parametres');
 
     Route::get('/adresse-de-livraison', [App\Http\Controllers\UserController::class, 'adresselivraison'])->name('user.adresselivraison');
@@ -76,6 +89,9 @@ Route::group(['prefix' => 'tabeau-de-bord/'], function () {
 
     Route::get('/tickets', [App\Http\Controllers\UserController::class, 'tickets'])->name('user.tickets');
     Route::get('/tickets/{sessionid}/details', [App\Http\Controllers\UserController::class, 'detailstickets'])->name('user.detailstickets');
+
+    Route::get('/plans', [App\Http\Controllers\UserController::class, 'plans'])->name('user.plans');
+
 
     Route::post('/parametres/update-profil', [App\Http\Controllers\UserController::class, 'updateprofil'])->name('user.updateprofil');
     Route::post('/parametres/update-password', [App\Http\Controllers\UserController::class, 'updatepassword'])->name('user.updatepassword');
@@ -86,7 +102,6 @@ Route::group(['prefix' => 'tabeau-de-bord/'], function () {
     Route::get('/singles/{id}/masquer', [App\Http\Controllers\UserController::class, 'masksingles'])->name('user.masksingles');
     Route::get('/singles/{id}/demasquer', [App\Http\Controllers\UserController::class, 'unmasksingles'])->name('user.unmasksingles');
     Route::delete('/singles/{id}/destroysingle', [App\Http\Controllers\UserController::class, 'destroysingle'])->name('user.deletesingles');
-
 
     Route::get('/albums', [App\Http\Controllers\UserController::class, 'albums'])->name('user.albums');
     Route::post('/albums', [App\Http\Controllers\UserController::class, 'storealbums'])->name('user.storealbums');
@@ -103,7 +118,6 @@ Route::group(['prefix' => 'adm/'], function () {
     Route::get('/', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
 
     Route::group(['prefix' => 'bases/'], function () {
-
 
         Route::group(['prefix' => 'pays/'], function () {
 
@@ -251,7 +265,6 @@ Route::group(['prefix' => 'adm/'], function () {
                 Route::post('/{id}/editer', [App\Http\Controllers\AdminController::class, 'updateevents'])->name('admin.updateevents');
                 Route::delete('/{id}/destroyevents', [App\Http\Controllers\AdminController::class, 'destroyevents'])->name('admin.deleteevents');
 
-
                 Route::group(['prefix' => '{id}/billeterie'], function () {
 
                     Route::get('/', [App\Http\Controllers\AdminController::class, 'billeterieevents'])->name('admin.billeterieevents');
@@ -294,7 +307,6 @@ Route::group(['prefix' => 'adm/'], function () {
     });
 
 });
-
 
 Auth::routes();
 

@@ -65,4 +65,11 @@ class LoginController extends Controller
         }
         return ['username' => $request->get('email'), 'password'=>$request->get('password')];
     }
+    public function logout(Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
+    }
 }

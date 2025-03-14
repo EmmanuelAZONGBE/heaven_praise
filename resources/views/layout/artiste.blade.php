@@ -11,7 +11,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	@hasSection ('meta')
-		@yield('meta')	
+		@yield('meta')
 	@endif
     <style>
         .post-title{
@@ -38,10 +38,10 @@
 		@yield('css')
 	@endif
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
-  
+
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
-    
+
 	<!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-06T9D5TKPN"></script>
 	<script>
@@ -51,7 +51,10 @@
 
 		gtag('config', 'G-06T9D5TKPN');
 	</script>
-	
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
 </head>
 
 <body class="category archive js">

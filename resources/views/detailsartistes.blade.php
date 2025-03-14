@@ -59,6 +59,12 @@
                                             {{ $totalEcoutes > 1 ? 'Écoutes' : 'Écoute' }}
                                         </a>
                                     </li>
+                                    <li class="author-social-link-click">
+                                        <a href="#"><i class="ti-mouse-alt"></i>
+                                            {{ $totalClicks }}
+                                            {{ $totalClicks > 1 ? 'Clics' : 'Clic' }}
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -203,7 +209,7 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="javascript:;" class="play-song"
+                                                    <a href="javascript:;" class="play-song track-click"
                                                         data-id="{{ $single->id }}"
                                                         data-artiste-id="{{ $artistes->id }}"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
@@ -216,7 +222,6 @@
                                                             stroke-linejoin="round">
                                                             <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                                         </svg>
-
                                                     </a>
                                                 </li>
                                             </ul>

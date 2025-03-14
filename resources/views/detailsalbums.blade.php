@@ -77,7 +77,7 @@
                                         @forelse ($singles as $single)
                                             <li class="single-item hover-details  d-flex align-items-center mb-3">
                                                 <a href="javascript:;"
-                                                    class="position-relative jp-playlist-item play-single"
+                                                    class="position-relative jp-playlist-item play-single "
                                                     data-id="{{ $single->id }}" data-artiste-id="{{ $artistes->id }}"
                                                     data-title="{{ $i }}. {{ $single->titre }}"
                                                     data-artist="{{ $single->User->nomartiste }}"

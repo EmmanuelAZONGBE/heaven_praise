@@ -18,7 +18,8 @@
                                 ->count();
                         @endphp
                         <li class="cat-item cat-item-2"><a href='#'>{{ $categorie->libelle }}</a>
-                            ({{ $count }})</li>
+                            ({{ $count }})
+                        </li>
                     @empty
                     @endforelse
                 </ul>
@@ -186,7 +187,10 @@
                                 </a>
                                 <div id="userMenuDropdow" class="dropdown-menu dropdown-menu-right"
                                     aria-labelledby="userMenu">
-
+                                    @if (Auth::user()->role == 'Auditeur')
+                                        <a class="dropdown-item" href="{{ route('user.dashboard') }}"><i
+                                                class="ti-home"></i>Dashboard</a>
+                                    @endif
                                     @if (Auth::user()->role == 'Artiste')
                                         <a class="dropdown-item" href="{{ route('user.dashboard') }}"><i
                                                 class="ti-home"></i>Dashboard</a>
@@ -401,6 +405,7 @@
                                 </li> --}}
                                 <li><a href='{{ route('artistes') }}'>Musique</a></li>
                                 <li><a href='{{ route('videos') }}'>Vidéos</a></li>
+                                <li><a href='{{ route('plans') }}'>Plan</a></li>
                             </ul>
                         </nav>
                     </div>
@@ -415,8 +420,8 @@
     </div>
 </header>
 <script>
-    $(document).ready(function () {
-        $('#userMenu').on('click', function (e) {
+    $(document).ready(function() {
+        $('#userMenu').on('click', function(e) {
             e.preventDefault();
             $(this).next('.dropdown-menu').toggleClass('show');
         });

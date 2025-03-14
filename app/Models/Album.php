@@ -20,4 +20,27 @@ class Album extends Model
     {
         return $this->hasMany('App\Models\Single');
     }
+
+    // Relation avec les singles
+    public function singles()
+    {
+        return $this->hasMany(Single::class); // Relation entre Album et Single
+    }
+
+    // Relation avec les écoutes (via les singles)
+    public function ecoutes()
+    {
+        return $this->hasManyThrough(Ecoute::class, Single::class, 'album_id', 'single_id');
+    }
+
+    // Récupérer les statistiques des écoutes et clics
+    public function getTotalEcoutesAttribute()
+    {
+        return $this->ecoutes()->sum('ecoutes.nombre_ecoutes');
+    }
+
+    public function getTotalClicksAttribute()
+    {
+        return $this->ecoutes()->sum('ecoutes.nombre_clicks');
+    }
 }

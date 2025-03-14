@@ -91,7 +91,14 @@
                                                             {{ $single->created_at->format('d M Y') }}
                                                         </td>
                                                         <td>
-                                                            0
+                                                            @php
+                                                                // Récupérer les écoutes pour ce single
+                                                                $ecoutes = $single->ecoutes;
+                                                                $nombre_ecoutes = $ecoutes->sum('nombre_ecoutes');
+                                                                $nombre_clicks = $ecoutes->sum('nombre_clicks');
+                                                            @endphp
+                                                            Écoutes : {{ $nombre_ecoutes }} <br>
+                                                            Clicks : {{ $nombre_clicks }}
                                                         </td>
                                                         <td>
                                                             @if ($single->statut == 'En Attente')

@@ -23,15 +23,15 @@
             <li class="nav-item">
                 <a class="nav-link {{ (Route::currentRouteName() == 'user.tracks') ? 'active  pcoded-trigger' : ''}}" href="{{route('user.tracks')}}" aria-controls="tab-5" aria-selected="false">Tracks</a>
             </li>
-        
+
             <li class="nav-item">
                 <a class="nav-link {{ (Route::currentRouteName() == 'user.playlists') ? 'active  pcoded-trigger' : ''}}" href="{{route('user.playlists')}}" aria-controls="tab-2" aria-selected="false">Playlists</a>
             </li>
-        
+
             <li class="nav-item">
                 <a class="nav-link {{ (Route::currentRouteName() == 'user.likes') ? 'active  pcoded-trigger' : ''}}" href="{{route('user.likes')}}" aria-controls="tab-3" aria-selected="false">Likes</a>
             </li>
-        
+
             <li class="nav-item">
                 <a class="nav-link {{ (Route::currentRouteName() == 'user.parametres') ? 'active  pcoded-trigger' : ''}}" href="{{route('user.parametres')}}" aria-controls="tab-4" aria-selected="false">Paramètres</a>
             </li>
@@ -43,15 +43,15 @@
             <li class="nav-item">
                 <a class="nav-link {{ (Route::currentRouteName() == 'user.dashboard') ? 'active  pcoded-trigger' : ''}}"  href="{{route('user.dashboard')}}" aria-controls="tab-1" aria-selected="true">Profil</a>
             </li>
-        
+
             <li class="nav-item">
                 <a class="nav-link {{ (Route::currentRouteName() == 'user.singles') ? 'active  pcoded-trigger' : ''}}" href="{{route('user.singles')}}" aria-controls="tab-5" aria-selected="false">Mes Singles</a>
             </li>
-        
+
             <li class="nav-item">
                 <a class="nav-link {{ (Route::currentRouteName() == 'user.albums') ? 'active  pcoded-trigger' : ''}} {{ (Route::currentRouteName() == 'user.titrealbums') ? 'active  pcoded-trigger' : ''}}" href="{{route('user.albums')}}" aria-controls="tab-2" aria-selected="false">Mes Albums</a>
             </li>
-        
+
             <li class="nav-item">
                 <a class="nav-link {{ (Route::currentRouteName() == 'user.parametres') ? 'active  pcoded-trigger' : ''}}" href="{{route('user.parametres')}}" aria-controls="tab-4" aria-selected="false">Paramètres</a>
             </li>

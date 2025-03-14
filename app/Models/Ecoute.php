@@ -13,6 +13,7 @@ class Ecoute extends Model
         'single_id',
         'user_id',
         'nombre_ecoutes',
+        'nombre_clicks',
     ];
 
     // Relation avec le modèle Single
