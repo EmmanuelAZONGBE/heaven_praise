@@ -69,6 +69,26 @@
                                                 @endif
                                             </div>
                                         </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group {{ $errors->has('type') ? ' has-error' : '' }}">
+                                                <label class="form-label" for="type">Type</label>
+                                                <div class="custom_select">
+                                                    <select class="form-control first_null not_chosen full-width"
+                                                        id="type" name="type">
+                                                        <option value="">Sélectionnez le type d'album</option>
+                                                        <option value="gratuit"
+                                                        {{ old('type') == 'gratuit' ? 'selected' : '' }}>Gratuit</option>
+                                                    <option value="payant" {{ old('type') == 'payant' ? 'selected' : '' }}>
+                                                        Payant</option>
+                                                    </select>
+                                                </div>
+                                                @if ($errors->has('type'))
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $errors->first('type') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
 
                                         <div class="col-12 col-md-12 col-lg-12 col-xl-12">
                                             <div class="form-group {{ $errors->has('description') ? ' has-error' : '' }}">
@@ -110,6 +130,7 @@
                                                 <th>Titre</th>
                                                 <th>Date</th>
                                                 <th>Statistiques</th>
+                                                <th>Type</th>
                                                 <th>Statut</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -152,6 +173,12 @@
                                                             Écoutes:{{ $album->total_ecoutes }}<br>
                                                             Clics: {{ $album->total_clicks }}
                                                         </div>
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            class="badge {{ $album->type == 'gratuit' ? 'badge-success' : 'badge-warning' }}">
+                                                            {{ ucfirst($album->type) }}
+                                                        </span>
                                                     </td>
                                                     <td>
                                                         @if ($album->statut == 'En Ligne')

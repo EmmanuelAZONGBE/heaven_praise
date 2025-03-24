@@ -310,10 +310,14 @@
                                     <div class="song-card">
                                         <div class="left-block">
                                             <div class="play">
-                                                <a href="javascript:;" class="joue play-s1 track-click" data-id="{{ $single->id }}"
-                                                    data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
+                                                <!-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}"
+                                                        data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
+                              -->
+                                                <a href="javascript:;" class="play-s1" data-id="{{ $single->id }}"
+                                                    data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                     data-title="{{ $i }}. {{ $single->titre }}"
+                                                    data-type="{{ $single->type }}"
                                                     data-artist="{{ $single->User->nomartiste ?? 'Artiste inconnu' }}">
                                                     <i class="fas fa-play"></i>
                                                 </a>
@@ -328,7 +332,9 @@
                                                     data-id="{{ $single->id }}" data-title="{{ $single->titre }}"
                                                     data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                    data-type="{{ $single->type }}" {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
                                                     data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
+
                                                     <a href="javascript:;">{{ $i }}.
                                                         {{ $single->titre }}</a>
                                                 </h6>
@@ -345,25 +351,30 @@
                                             <a href="javascript:;" class="action-btn add" data-id="{{ $single->id }}"
                                                 data-title="{{ $single->titre }}"
                                                 data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
+                                                data-type="{{ $single->type }}"
                                                 data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
                                                 data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
+
                                                 <span class="tooltip-pop">Ajouter à la Playlist</span>
                                                 <i class="fa-solid fa-list"></i>
                                             </a>
                                             <!-- Ajout du bouton "Partager" avec le compteur de Partager -->
                                             <a href="javascript:;" class="action-btn share"
                                                 data-title="{{ $single->titre }}" data-cover="{{ $single->cover_url }}"
+                                                data-type="{{ $single->type }}"
                                                 data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}">
                                                 <span class="tooltip-pop">Partager</span>
                                                 <i class="fa-solid fa-share"></i>
                                             </a>
                                             <a href="javascript:;" class="action-btn like"
-                                                data-id="{{ $single->id }}">
+                                                data-type="{{ $single->type }}" data-id="{{ $single->id }}">
                                                 <span class="tooltip-pop">J'aime</span>
                                                 <i class="fa-solid fa-heart"></i>
                                             </a>
                                             <span class="like-count"
                                                 data-id="{{ $single->id }}">{{ $single->nombre_aimes ?? 0 }}</span>
+
                                         </div>
                                     </div>
                                     @php $i++; @endphp
@@ -387,11 +398,12 @@
                                     <div class="song-card">
                                         <div class="left-block">
                                             <div class="play">
-                                                <a href="javascript:;" class="joue play-s2"
-                                                    data-id="{{ $single->id }}"
+                                                <a href="javascript:;" class="play-s2" data-id="{{ $single->id }}"
+                                                    {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
                                                     data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                     data-title="{{ $i }}. {{ $single->titre }}"
+                                                    data-type="{{ $single->type }}"
                                                     data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}">
                                                     <i class="fas fa-play"></i>
                                                 </a>
@@ -404,9 +416,12 @@
                                             <div>
                                                 <h6 class="titl mb-1" style="font-size: 15px;"
                                                     data-id="{{ $single->id }}" data-title="{{ $single->titre }}"
+                                                    data-type="{{ $single->type }}"
                                                     data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                    {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
                                                     data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
+
                                                     <a href="javascript:;">{{ $i }}.
                                                         {{ $single->titre }}</a>
                                                 </h6>
@@ -420,21 +435,23 @@
                                         </div>
                                         <div class="right-block">
                                             <a href="javascript:;" class="action-btn add" data-id="{{ $single->id }}"
-                                                data-title="{{ $single->titre }}"
+                                                data-title="{{ $single->titre }}" data-type="{{ $single->type }}"
                                                 data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                 data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
                                                 data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
+
                                                 <span class="tooltip-pop">Ajouter à la Playlist</span>
                                                 <i class="fa-solid fa-list"></i>
                                             </a>
                                             <a href="javascript:;" class="action-btn share"
-                                                data-title="{{ $single->titre }}"
+                                                data-title="{{ $single->titre }}" data-type="{{ $single->type }}"
                                                 data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}">
                                                 <span class="tooltip-pop">Partager</span>
                                                 <i class="fa-solid fa-share"></i>
                                             </a>
                                             <a href="javascript:;" class="action-btn like"
-                                                data-id="{{ $single->id }}">
+                                                data-type="{{ $single->type }}" data-id="{{ $single->id }}">
                                                 <span class="tooltip-pop">J'aime</span>
                                                 <i class="fa-solid fa-heart"></i>
                                             </a>
@@ -668,7 +685,8 @@
                                                             </div>
                                                         </div>
                                                         <h6 class="post-title pr-5 pl-5 mb-10 mt-15 text-limit-2-row">
-                                                            <a class='color-white' href='#'>{{ $live->titre }}</a>
+                                                            <a class='color-white'
+                                                                href='#'>{{ $live->titre }}</a>
                                                         </h6>
                                                         {{-- <div class="entry-meta meta-1 font-small color-grey mt-10 pr-5 pl-5">
                                                         <span class="post-on">03 Jan</span>

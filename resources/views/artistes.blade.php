@@ -57,11 +57,6 @@
                                     <span
                                         class="hit-count has-dot">{{ $countsingle = $singles->where('user_id', $artiste->id)->where('statut', 'En Ligne')->where('masque', 0)->count() }}
                                         {{ $countsingle > 1 ? 'Singles' : 'Single' }}</span>
-                                    {{-- Affichage du nombre total d'écoutes des singles de l'artiste
-                                    <span id="hit-count" class="hit-count has-dot">
-                                        {{ $artiste->totalEcoutes }}
-                                        {{ $artiste->totalEcoutes > 1 ? 'Écoutes' : 'Écoute' }}
-                                    </span> --}}
                                 </div>
                             </div>
                         @empty

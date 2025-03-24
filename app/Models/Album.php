@@ -8,7 +8,7 @@ class Album extends Model
 {
     //
     protected $fillable = [
-        'titre','slug','description','cover','statut','masque','recommanded','user_id'
+        'titre','slug','description','cover','statut','masque','recommanded','user_id','type',
     ];
 
 

@@ -87,6 +87,26 @@
                                                 @endif
                                             </div>
                                         </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group {{ $errors->has('type') ? ' has-error' : '' }}">
+                                                <label class="form-label" for="type">Type</label>
+                                                <div class="custom_select">
+                                                    <select class="form-control first_null not_chosen full-width"
+                                                        id="type" name="type">
+                                                        <option value="">Sélectionnez le type</option>
+                                                        <option value="gratuit"
+                                                        {{ old('type') == 'gratuit' ? 'selected' : '' }}>Gratuit</option>
+                                                    <option value="payant" {{ old('type') == 'payant' ? 'selected' : '' }}>
+                                                        Payant</option>
+                                                    </select>
+                                                </div>
+                                                @if ($errors->has('type'))
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $errors->first('type') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                         <div class="col-md-2">
                                             <button class="btn btn-fill-out" type="submit">Publier</button>
                                         </div>
@@ -116,6 +136,7 @@
                                                 <th>Titre</th>
                                                 <th>Date</th>
                                                 <th>Statistiques</th>
+                                                <th>Type</th>
                                                 <th>Statut</th>
                                                 <th>Actions </th>
                                             </tr>
@@ -175,6 +196,12 @@
                                                             Écoutes : {{ $nombre_ecoutes }} <br>
                                                             Clicks : {{ $nombre_clicks }}
                                                         </div>
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            class="badge {{ $single->type == 'gratuit' ? 'badge-success' : 'badge-warning' }}">
+                                                            {{ ucfirst($single->type) }}
+                                                        </span>
                                                     </td>
                                                     <td>
                                                         @if ($single->statut == 'En Ligne')

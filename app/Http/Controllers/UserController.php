@@ -198,6 +198,7 @@ class UserController extends Controller
             'genre' => 'required|string|max:255',
             //'fichier_audio' =>  'required|mimes:mp3|max:10240',
             'titre' => 'required|string|unique:singles',
+            'type' => 'required|in:gratuit,payant',
         ]);
 
         $time    = time();
@@ -214,6 +215,7 @@ class UserController extends Controller
             'cover'    => $imgname,
             'audio'    => $songname,
             'genre_id' => $req->genre,
+            'type'     => $req->type,
             'user_id'  => Auth::user()->id,
         ]);
 
@@ -286,6 +288,7 @@ class UserController extends Controller
             'cover'       => 'required|mimes:svg,png,jpg,jpeg|dimensions:width=500,height=500',
             'titre'       => 'required|string|unique:albums',
             'description' => 'required|string',
+            'type'        => 'required|in:gratuit,payant',
         ]);
 
         $time    = time();
@@ -310,6 +313,7 @@ class UserController extends Controller
             'slug'        => $slug,
             'description' => $req->description,
             'cover'       => $imgname,
+            'type'     => $req->type,
             'user_id'     => Auth::user()->id,
         ]);
 
@@ -354,6 +358,7 @@ class UserController extends Controller
             'genre'         => 'required|string|max:255',
             'fichier_audio' => 'required|mimes:mp3|max:10240',
             'titre'         => 'required|string|unique:singles',
+            'type'        => 'required|in:gratuit,payant',
         ]);
 
         $time     = time();
@@ -368,6 +373,7 @@ class UserController extends Controller
             'genre_id' => $req->genre,
             'user_id'  => Auth::user()->id,
             'album_id' => $find->id,
+            'type'=> $req->type,
         ]);
 
         return redirect()->back()->with('success', '<strong>Votre titre a été envoyé avec succès à l\'album ' . $find->titre . '!</strong><br>Vous serez notifié une fois qu\'il sera publié par les administrateurs.');

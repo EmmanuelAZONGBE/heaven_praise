@@ -139,13 +139,13 @@
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/jquery.jplayer.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/audio-player.js.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/player/volume.js')}}"></script>
-    {{-- <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/nice_select/jquery.nice-select.min.js')}}"></script> --}}
+    <!-- <script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/nice_select/jquery.nice-select.min.js')}}"></script>-->
 	<script type="text/javascript" src="{{asset('PlayerTemplate/js/plugins/scroll/jquery.mCustomScrollbar.js')}}"></script>
     <script type="text/javascript" src="{{asset('PlayerTemplate/js/custom.js')}}"></script>
 
 
-{{-- originale code --}}
-    {{-- <script type="text/javascript">
+<!-- originale code  -->
+<!-- <script type="text/javascript">
 
         if ($('.audio-player').length) {
 		var myPlayListOtion = '<ul class="more_option"><li><a href="#"><span class="opt_icon" title="Add To Favourites"><span class="icon icon_fav"></span></span></a></li><li><a href="#"><span class="opt_icon" title="Add To Queue"><span class="icon icon_queue"></span></span></a></li><li><a href="#"><span class="opt_icon" title="Download Now"><span class="icon icon_dwn"></span></span></a></li><li><a href="#"><span class="opt_icon" title="Add To Playlist"><span class="icon icon_playlst"></span></span></a></li><li><a href="#"><span class="opt_icon" title="Share"><span class="icon icon_share"></span></span></a></li></ul>';
@@ -225,7 +225,7 @@
                 });
 
                 return false;
-            }).mouseup(function() {
+                }).mouseup(function() {
                 $(window).unbind("mousemove");
             });
 
@@ -292,24 +292,29 @@
 
         });
     }
-    </script> --}}
+</script> -->
 
 
-<script type="text/javascript">
+<!-- <script>
     $(document).ready(function() {
+    if ($('.audio-player').length) {
         // Définition des clés de stockage local
-        const LOCAL_STORAGE_KEY = "savedPlaylist";
         const localStorageKeys = {
             volume: 'audio_player_volume',
             currentTrack: 'audio_player_current_track',
             currentTime: 'audio_player_current_time',
             playlist: 'audio_player_playlist',
-            progress: 'audio_player_progress', // Ajout pour la progression
-            currentMinutes: 'audio_player_current_minutes', // Ajout pour les minutes
-            isPlaying: 'audio_player_is_playing' // Ajout pour savoir si la chanson est en cours de lecture
+            progress: 'audio_player_progress',
+            currentMinutes: 'audio_player_current_minutes',
+            currentSeconds: 'audio_player_current_seconds',
+            isPlaying: 'audio_player_is_playing',
+            single: 'audio_player_single'
         };
 
         let currentSong = {}; // Objet pour stocker la chanson en cours
+        let currentSongId = null; // Variable pour stocker l'ID de la chanson en cours
+        let hasPlayedToEnd = false; // Flag pour suivre si la chanson a été lue jusqu'à la fin
+        let playTimeout = null; // Pour gérer la limite de lecture des chansons payantes
 
         // Playlist par défaut avec un son d'accueil
         const defaultPlaylist = [
@@ -318,344 +323,486 @@
                 title: "Bienvenue",
                 artist: "Heavenly Praise",
                 mp3: "https://heavenly-praise.com/usx_files/songs/welcome-heavenly-praise.mp3",
-                option:"",
+                type: "gratuit",
+                option: ""
             }
         ];
 
-        if ($('.audio-player').length) {
-            // Récupération de la playlist depuis localStorage ou utilisation de la playlist par défaut
-            const savedPlaylist = localStorage.getItem(localStorageKeys.playlist);
-            const playlistData = savedPlaylist ? JSON.parse(savedPlaylist) : defaultPlaylist;
-
-            // Initialisation du lecteur avec la playlist récupérée
-            const myPlaylist = new jPlayerPlaylist({
-                jPlayer: "#jquery_jplayer_1",
-                cssSelectorAncestor: "#jp_container_1"
-            }, playlistData, {
-                swfPath: "PlayerTemplate/js/plugins",
-                supplied: "mp3",
-                wmode: "window",
-                useStateClassSkin: true,
-                autoBlur: false,
-                smoothPlayBar: true,
-                keyEnabled: true,
-                playlistOptions: {
-                    autoPlay: false
-                }
-            });
-
-            // Sauvegarde de la playlist dans le stockage local
-            function savePlaylistToStorage() {
-                localStorage.setItem(localStorageKeys.playlist, JSON.stringify(myPlaylist.playlist));
-                console.log("Playlist sauvegardée.");
+        // Récupération de la playlist depuis localStorage ou utilisation de la playlist par défaut
+        const savedPlaylist = localStorage.getItem(localStorageKeys.playlist);
+        const singlefromStorage = localStorage.getItem(localStorageKeys.single);
+        console.log('autre',singlefromStorage);
+        const single = singlefromStorage ? JSON.parse(singlefromStorage) : null;
+        // title, artist, img, mp3, type
+        const playlistData = !single && savedPlaylist ? JSON.parse(savedPlaylist) : single ? [
+            {
+                ...single,
+                image: single.img,
+                option: ""
             }
+        ] : defaultPlaylist;
+        console.log('bon play',playlistData);
 
-            // Sauvegarde de l'état du lecteur (volume, piste actuelle, temps de lecture, progression)
-            function saveStateToLocalStorage() {
-                const current = myPlaylist.current;
-                const currentTime = $("#jquery_jplayer_1").data("jPlayer").status.currentTime || 0;
-                const volume = $("#jquery_jplayer_1").data("jPlayer").options.volume || 1;
-                const progress = (currentTime / $("#jquery_jplayer_1").data("jPlayer").status.duration) * 100; // Pourcentage de progression
-                const currentMinutes = Math.floor(currentTime / 60); // Minutes écoulées
-                const isPlaying = !$("#jquery_jplayer_1").data("jPlayer").status.paused; // État de lecture (play/pause)
-
-                localStorage.setItem(localStorageKeys.currentTrack, current);
-                localStorage.setItem(localStorageKeys.currentTime, currentTime);
-                localStorage.setItem(localStorageKeys.volume, volume);
-                localStorage.setItem(localStorageKeys.progress, progress);
-                localStorage.setItem(localStorageKeys.currentMinutes, currentMinutes);
-                localStorage.setItem(localStorageKeys.isPlaying, isPlaying); // Sauvegarder l'état de lecture
-
-                console.log("État du lecteur sauvegardé.");
+        // Initialisation du lecteur avec la playlist récupérée
+        const myPlaylist = new jPlayerPlaylist({
+            jPlayer: "#jquery_jplayer_1",
+            cssSelectorAncestor: "#jp_container_1"
+        }, playlistData, {
+            swfPath: "PlayerTemplate/js/plugins",
+            supplied: "mp3",
+            wmode: "window",
+            useStateClassSkin: true,
+            autoBlur: false,
+            smoothPlayBar: true,
+            keyEnabled: true,
+            playlistOptions: {
+                autoPlay: false
             }
+        });
 
-            // Restauration de l'état du lecteur après rechargement de la page
-            function restoreStateFromLocalStorage() {
-                const currentTrackIndex = localStorage.getItem(localStorageKeys.currentTrack);
-                const currentTime = localStorage.getItem(localStorageKeys.currentTime);
-                const savedVolume = localStorage.getItem(localStorageKeys.volume);
-                const savedProgress = localStorage.getItem(localStorageKeys.progress);
-                const savedMinutes = localStorage.getItem(localStorageKeys.currentMinutes);
-                const isPlaying = localStorage.getItem(localStorageKeys.isPlaying) === 'true';
-
-                if (currentTrackIndex !== null) {
-                    if (currentTrackIndex < myPlaylist.playlist.length) {
-                        myPlaylist.play(currentTrackIndex);
-
-                        // Attendre que la piste soit chargée avant de modifier la position
-                        setTimeout(() => {
-                            if (currentTime !== null) {
-                                $("#jquery_jplayer_1").jPlayer("playHead", parseFloat(currentTime / $("#jquery_jplayer_1").data("jPlayer").status.duration * 100));
-                            }
-                        }, 1000); // Délai pour s'assurer que la durée est disponible
-                    }
-                }
-
-                if (savedVolume !== null) {
-                    $("#jquery_jplayer_1").jPlayer("volume", parseFloat(savedVolume));
-                }
-
-                if (savedProgress !== null) {
-                    $('.jp-play-bar').css('width', savedProgress + '%');
-                }
-
-                if (savedMinutes !== null) {
-                    $('.jp-time').text(savedMinutes + ' min');
-                }
-
-                if (isPlaying) {
-                    $("#jquery_jplayer_1").jPlayer("play"); // Reprendre la lecture si nécessaire
-                } else {
-                    $("#jquery_jplayer_1").jPlayer("pause"); // Si c'est en pause, laisser en pause
-                }
-            }
-
-            // Sauvegarde de l'état à chaque changement (play, pause, volume)
-            $("#jquery_jplayer_1").on($.jPlayer.event.play + ' ' + $.jPlayer.event.pause, saveStateToLocalStorage);
-            $("#jquery_jplayer_1").on($.jPlayer.event.volumechange, saveStateToLocalStorage);
-
-            // Restauration après chargement du lecteur
-            $("#jquery_jplayer_1").on($.jPlayer.event.ready, restoreStateFromLocalStorage);
-
-            // Mise à jour dynamique de la barre de progression
-            function updateProgressBar() {
-                const currentTime = $("#jquery_jplayer_1").data("jPlayer").status.currentTime;
-                const duration = $("#jquery_jplayer_1").data("jPlayer").status.duration;
-                const percentage = (currentTime / duration) * 100;
-                const currentMinutes = Math.floor(currentTime / 60); // minutes écoulées
-
-                $('.jp-play-bar').css('width', percentage + '%');
-                localStorage.setItem(localStorageKeys.currentTime, currentTime);
-                localStorage.setItem(localStorageKeys.progress, percentage);
-                localStorage.setItem(localStorageKeys.currentMinutes, currentMinutes);
-            }
-
-            // Suivi du temps de lecture
-            $("#jquery_jplayer_1").on($.jPlayer.event.timeupdate, updateProgressBar);
-
-            // Gestion du drag de la barre de progression
-            var timeDrag = false;
-            $('.jp-seek-bar').mousedown(function(e) {
-                timeDrag = true;
-                updatebar(e.pageX);
-            });
-
-            $(document).mouseup(function(e) {
-                if (timeDrag) {
-                    timeDrag = false;
-                    updatebar(e.pageX);
-                }
-            });
-
-            $(document).mousemove(function(e) {
-                if (timeDrag) {
-                    updatebar(e.pageX);
-                }
-            });
-
-            function updatebar(x) {
-                var progress = $('.jp-progress');
-                var position = x - progress.offset().left;
-                var percentage = 100 * position / progress.width();
-                percentage = Math.max(0, Math.min(100, percentage));
-                $("#jquery_jplayer_1").jPlayer("playHead", percentage);
-                $('.jp-play-bar').css('width', percentage + '%');
-            }
-
-             // Ajout d'une chanson à la playlist
-             $('.add-to-playlist').on('click', function() {
-                if (currentSong.mp3) {
-                    const isDuplicate = myPlaylist.playlist.some(track => track.mp3 === currentSong.mp3);
-
-                    console.log('log song', currentSong);
-                    if (!isDuplicate) {
-                        currentSong.image = currentSong.img;
-                        currentSong.option = "";
-                        myPlaylist.add(currentSong);
-                        $('.playlist-items').append('<li class="playlist-item" data-title="' + currentSong.title + '" data-artist="' + currentSong.artist + '" data-img="' + currentSong.img + '" data-mp3="' + currentSong.mp3 + '">' + currentSong.title + ' - ' + currentSong.artist + '</li>');
-                        savePlaylistToStorage();
-                        alert(currentSong.title + ' - ' + currentSong.artist + ' a été ajouté à la playlist.');
-                    } else {
-                        console.warn("Cette chanson est déjà dans la playlist.");
-                        alert("Cette chanson est déjà dans la playlist.");
-                    }
-                } else {
-                    console.error('Aucune chanson en cours de lecture à ajouter.');
-                    alert('Aucune chanson en cours de lecture à ajouter.');
-                }
-            });
-
-            $('.add').on('click', function() {
-                var songId = $(this).data('id');
-                var title = $(this).data('title');
-                var artist = $(this).data('artist');
-                var mp3 = $(this).data('mp3');
-                var img = $(this).data('img');
-
-                if (mp3) {
-                    const isDuplicate = myPlaylist.playlist.some(track => track.mp3 === mp3);
-
-                    if (!isDuplicate) {
-                        var song = {
-                            id: songId,
-                            title: title,
-                            artist: artist,
-                            mp3: mp3,
-                            image:img,
-                            option: ""
-                        };
-
-                        console.log("song", song);
-
-                        myPlaylist.add(song);
-                        $('.playlist-items').append('<li class="playlist-item" data-title="' + title + '" data-artist="' + artist + '" data-img="' + img + '" data-mp3="' + mp3 + '">' + title + ' - ' + artist + '</li>');
-                        savePlaylistToStorage();
-
-                        alert(title + ' - ' + artist + ' a été ajouté à la playlist.');
-                    } else {
-                        console.warn("Cette chanson est déjà dans la playlist.");
-                        alert("Cette chanson est déjà dans la playlist.");
-                    }
-                } else {
-                    console.error('Aucune chanson en cours de lecture à ajouter.');
-                    alert('Aucune chanson en cours de lecture à ajouter.');
-                }
-            });
-
-          // Lecture d'une chanson sélectionnée
-          $('body').on('click', '.play-song, .play-single, .play-s1, .play-s2', function() {
-                var singleId = $(this).data('id');
-                var title = $(this).data('title');
-                var artist = $(this).data('artist');
-                var img = $(this).data('img');
-                var mp3 = $(this).data('mp3');
-                localStorage.setItem(localStorageKeys.single, JSON.stringify({title, artist, img, mp3}));
-                console.log(" current  song is  playing");
-
-
-
-        if (title && artist && img && mp3) {
-            currentSongId = singleId;
-            $("#jquery_jplayer_1").jPlayer("setMedia", { mp3, oga: mp3.replace('.mp3', '.ogg') }).jPlayer("play");
-
-            // Mise à jour des informations sur la barre de lecture
-            $('.jp-track-name').text(title);
-            $('.jp-artist-name').text(artist);
-            $('.jp-cover-art').attr('src', img);
-
-                        // Envoi de la requête AJAX pour incrémenter l'écoute
-                        // $.ajax({
-                        //     url: "/ecouter-chanson",
-                        //     type: "POST",
-                        //     data: {
-                        //         single_id: singleId, // Envoyer l'ID de la chanson
-                        //         _token: $('meta[name="csrf-token"]').attr('content')
-                        //     },
-                        //     success: function(response) {
-                        //         if (response.success) {
-                        //             console.log("Nombre d'écoutes mis à jour :", response.nombre_ecoutes);
-                        //         }
-                        //     },
-                        //     error: function(xhr) {
-                        //         console.error("Erreur lors de l'incrémentation des écoutes", xhr.responseText);
-                        //     }
-                        // });
-                } else {
-                    console.error('Données manquantes pour jouer la chanson.');
-                }
-            });
-            let currentSongId = null; // Variable globale pour stocker l'ID de la chanson en cours
-
-            let hasPlayedToEnd = false;
-
-            $("#jquery_jplayer_1").on($.jPlayer.event.timeupdate, function(event) {
-                const currentTime = $("#jquery_jplayer_1").data("jPlayer").status.currentTime;
-                const duration = $("#jquery_jplayer_1").data("jPlayer").status.duration;
-
-                // Vérifiez si la chanson a été écoutée jusqu'à la fin
-                if (currentTime >= duration - 1 && !hasPlayedToEnd) {
-                    hasPlayedToEnd = true;
-
-                    // Envoi de la requête AJAX pour incrémenter l'écoute
-                    const singleId = $(this).data('id');
-                    const artisteId = $(this).attr('data-artiste-id'); // Assure-toi que cet attribut est bien défini
-                    $.ajax({
-                        url: "/ecouter-chanson",
-                        type: "POST",
-                        data: {
-                            single_id: currentSongId, // Utiliser l'ID stocké
-                            _token: $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            console.log("Réponse complète:", response);
-                            if (response.success) {
-                                console.log("Nombre d'écoutes mis à jour :", response.nombre_ecoutes);
-                                // Mettre à jour l'interface utilisateur
-                                var hitCountElement = $('#hit-count');
-                                var newHitCount = response.nombre_ecoutes;
-                                var ecouteText = newHitCount > 1 ? 'Écoutes' : 'Écoute';
-
-                                // Mettre à jour le texte de l'élément
-                                hitCountElement.text(newHitCount + ' ' + ecouteText);
-                            }
-                        },
-                        error: function(xhr) {
-                            console.error("Erreur lors de l'incrémentation des écoutes",xhr.responseText);
-                        }
-                    });
-                }
-            });
-
-            // Réinitialiser le flag lorsque la chanson change
-            $("#jquery_jplayer_1").on($.jPlayer.event.play, function(event) {
-                hasPlayedToEnd = false;
-            });
-
-             // Permettre la lecture en cliquant sur le titre
-             $(".single-item__title a,.titl a, .song a ").on("click", function (e) {
-            e.preventDefault();
-            $(this).closest(".single-item,.song-card").find(".play-single,.play-s2, .play-s1").trigger("click");
-            });
-
-            // Suppression de toutes les chansons sauf celle par défaut
-            $('.ms_clear').on('click', function() {
-                if (confirm("Voulez-vous vraiment réinitialiser la playlist ?")) {
-                    myPlaylist.setPlaylist(defaultPlaylist);
-                    localStorage.setItem(localStorageKeys.playlist, JSON.stringify(defaultPlaylist));
-                    alert("Playlist réinitialisée.");
-                }
-            });
-
-            // Sauvegarde manuelle de la playlist
-            $('#save-playlist').on('click', savePlaylistToStorage);
-
-            $("#jquery_jplayer_1").on($.jPlayer.event.ready + ' ' + $.jPlayer.event.play, function(event) {
-                     var single = localStorage.getItem(localStorageKeys.single);
-                     console.log(single,"single");
-                     if(single){
-                        localStorage.removeItem(localStorageKeys.single);
-                         return;
-                     }
-                    var current = myPlaylist.current;
-                    var playlist = myPlaylist.playlist;
-                    var play = myPlaylist.play;
-                    // console.log(current,"emmanuel");
-                    $.each(playlist, function(index, obj) {
-                        if (index == current) {
-                            $(".jp-now-playing").html("<div class='jp-track-name'><span class='que_img'><img src='"+obj.image+"'></span><div class='que_data'>" + obj.title + " <div class='jp-artist-name'>" + obj.artist + "</div></div></div>");
-                        }
-                    });
-            });
+        // Sauvegarde de la playlist dans le stockage local
+        function savePlaylistToStorage() {
+            localStorage.setItem(localStorageKeys.playlist, JSON.stringify(myPlaylist.playlist));
+            console.log("Playlist sauvegardée.");
         }
 
-         // Partager
+        // Sauvegarde de l'état du lecteur (volume, piste actuelle, temps de lecture, progression)
+        function saveStateToLocalStorage() {
+            const current = myPlaylist.current;
+            const jPlayer = $("#jquery_jplayer_1").data("jPlayer");
+
+            if (!jPlayer || !jPlayer.status) return; // Protection contre les erreurs
+
+            const currentTime = jPlayer.status.currentTime || 0;
+            const volume = jPlayer.options.volume || 1;
+            const duration = jPlayer.status.duration || 1; // Éviter division par zéro
+            const progress = (currentTime / duration) * 100; // Pourcentage de progression
+            const currentMinutes = Math.floor(currentTime / 60); // Minutes écoulées
+            const currentSeconds = Math.floor(currentTime % 60); // Secondes écoulées
+            const isPlaying = !jPlayer.status.paused; // État de lecture (play/pause)
+
+            localStorage.setItem(localStorageKeys.currentTrack, current);
+            localStorage.setItem(localStorageKeys.currentTime, currentTime);
+            localStorage.setItem(localStorageKeys.volume, volume);
+            localStorage.setItem(localStorageKeys.progress, progress);
+            localStorage.setItem(localStorageKeys.currentMinutes, currentMinutes);
+            localStorage.setItem(localStorageKeys.currentSeconds, currentSeconds);
+            localStorage.setItem(localStorageKeys.isPlaying, isPlaying);
+
+            console.log("État du lecteur sauvegardé: Temps=" + currentTime + "s, Progression=" + progress + "%, En lecture=" + isPlaying);
+        }
+
+        // Restauration de l'état du lecteur après rechargement de la page
+        function restoreStateFromLocalStorage() {
+            const currentTrackIndex = localStorage.getItem(localStorageKeys.currentTrack);
+            const currentTime = localStorage.getItem(localStorageKeys.currentTime);
+            const savedVolume = localStorage.getItem(localStorageKeys.volume);
+            const isPlaying = localStorage.getItem(localStorageKeys.isPlaying) === 'true';
+
+            console.log("Tentative de restauration: Piste=" + currentTrackIndex + ", Temps=" + currentTime + "s, En lecture=" + isPlaying);
+
+            if (savedVolume !== null) {
+                $("#jquery_jplayer_1").jPlayer("volume", parseFloat(savedVolume));
+            }
+
+            if (currentTrackIndex !== null && playlistData.length > 0) {
+                const trackIndex = parseInt(currentTrackIndex, 10);
+
+                if (!isNaN(trackIndex) && trackIndex >= 0 && trackIndex < myPlaylist.playlist.length) {
+                    // Sélectionner la piste mais ne pas la lire automatiquement
+                    console.log("Sélection de la piste " + trackIndex);
+                    myPlaylist.select(trackIndex);
+
+                    // Attendre que le média soit chargé avant de définir la position
+                    $("#jquery_jplayer_1").one($.jPlayer.event.loadeddata, function() {
+                        console.log("Média chargé, définition de la position à " + currentTime + "s");
+                        if (currentTime !== null) {
+                            // Définir la position exacte en secondes
+                            $("#jquery_jplayer_1").jPlayer("play", parseFloat(currentTime));
+
+                            // Si la chanson n'était pas en cours de lecture, mettre en pause immédiatement
+                            if (!isPlaying) {
+                                setTimeout(function() {
+                                    $("#jquery_jplayer_1").jPlayer("pause");
+                                    console.log("Pause automatique appliquée");
+                                }, 50);
+                            }
+                        }
+                    });
+
+                    // Fallback si loadeddata ne se déclenche pas
+                    setTimeout(function() {
+                        if (currentTime !== null) {
+                            console.log("Fallback: définition de la position à " + currentTime + "s");
+                            $("#jquery_jplayer_1").jPlayer("play", parseFloat(currentTime));
+
+                            if (!isPlaying) {
+                                setTimeout(function() {
+                                    $("#jquery_jplayer_1").jPlayer("pause");
+                                }, 50);
+                            }
+                        }
+                    }, 1500);
+                }
+            }
+
+            updateProgressDisplay();
+        }
+
+        // Mise à jour visuelle de la barre de progression
+        function updateProgressDisplay() {
+            const savedProgress = localStorage.getItem(localStorageKeys.progress);
+            const savedMinutes = localStorage.getItem(localStorageKeys.currentMinutes);
+            const savedSeconds = localStorage.getItem(localStorageKeys.currentSeconds);
+
+            if (savedProgress !== null) {
+                $('.jp-play-bar').css('width', savedProgress + '%');
+            }
+
+            if (savedMinutes !== null && savedSeconds !== null) {
+                const formattedSeconds = savedSeconds < 10 ? '0' + savedSeconds : savedSeconds;
+                $('.jp-current-time').text(savedMinutes + ':' + formattedSeconds);
+            }
+        }
+
+        // Mise à jour dynamique de la barre de progression
+        function updateProgressBar() {
+            const jPlayer = $("#jquery_jplayer_1").data("jPlayer");
+            if (!jPlayer || !jPlayer.status) return; // Protection contre les erreurs
+
+            const currentTime = jPlayer.status.currentTime || 0;
+            const duration = jPlayer.status.duration || 1; // Éviter division par zéro
+            const percentage = (currentTime / duration) * 100;
+            const currentMinutes = Math.floor(currentTime / 60);
+            const currentSeconds = Math.floor(currentTime % 60);
+
+            // Formater le temps pour l'affichage (MM:SS)
+            const formattedSeconds = currentSeconds < 10 ? '0' + currentSeconds : currentSeconds;
+            const formattedTime = currentMinutes + ':' + formattedSeconds;
+
+            // Mettre à jour l'affichage visuel
+            $('.jp-play-bar').css('width', percentage + '%');
+            $('.jp-current-time').text(formattedTime);
+
+            // Sauvegarder les informations précises
+            localStorage.setItem(localStorageKeys.currentTime, currentTime.toString());
+            localStorage.setItem(localStorageKeys.progress, percentage.toString());
+            localStorage.setItem(localStorageKeys.currentMinutes, currentMinutes.toString());
+            localStorage.setItem(localStorageKeys.currentSeconds, currentSeconds.toString());
+
+            // Vérifier si on est à la fin de la chanson
+            if (currentTime >= duration - 1 && !hasPlayedToEnd && currentSongId) {
+                hasPlayedToEnd = true;
+
+                // Envoyer une requête pour enregistrer l'écoute complète
+                $.ajax({
+                    url: "/ecouter-chanson",
+                    type: "POST",
+                    data: {
+                        single_id: currentSongId,
+                        action: "ecoute",
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log("Nombre d'écoutes mis à jour :", response.nombre_ecoutes);
+                        var hitCountElement = $('#hit-count');
+                        if (hitCountElement.length) {
+                            var newHitCount = response.nombre_ecoutes;
+                            var ecouteText = newHitCount > 1 ? 'Écoutes' : 'Écoute';
+                            hitCountElement.text(newHitCount + ' ' + ecouteText);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error("Erreur lors de l'incrémentation des écoutes", xhr.responseText);
+                    }
+                });
+            }
+
+            // Vérifier pour les chansons payantes
+            const currentTrack = myPlaylist.playlist[myPlaylist.current];
+            if (currentTrack && currentTrack.type === 'payant' && currentTime > 30 && !playTimeout) {
+                playTimeout = setTimeout(function() {
+                    $("#jquery_jplayer_1").jPlayer("pause");
+                    alert("Cette chanson est payante. Abonnez-vous pour écouter en entier.");
+                }, 100); // Presque immédiat à ce stade
+            }
+        }
+
+        $('.knob-wrapper').mousedown(function() {
+                $(window).mousemove(function(e) {
+                    var angle1 = getRotationDegrees($('.knob')),
+                    volume = angle1 / 270
+
+                    if (volume > 1) {
+                        $("#jquery_jplayer_1").jPlayer("volume", 1);
+                    } else if (volume <= 0) {
+                        $("#jquery_jplayer_1").jPlayer("mute");
+                    } else {
+                        $("#jquery_jplayer_1").jPlayer("volume", volume);
+                        $("#jquery_jplayer_1").jPlayer("unmute");
+                    }
+                });
+
+                return false;
+                }).mouseup(function() {
+                $(window).unbind("mousemove");
+            });
+
+        // Gestion du drag de la barre de progression
+        var timeDrag = false;
+        $('.jp-seek-bar').mousedown(function(e) {
+            timeDrag = true;
+            updatebar(e.pageX);
+        });
+
+        $(document).mouseup(function(e) {
+            if (timeDrag) {
+                timeDrag = false;
+                updatebar(e.pageX);
+                // Sauvegarder l'état après le déplacement manuel
+                setTimeout(saveStateToLocalStorage, 100);
+            }
+        });
+
+        $(document).mousemove(function(e) {
+            if (timeDrag) {
+                updatebar(e.pageX);
+            }
+        });
+
+        function updatebar(x) {
+            var progress = $('.jp-progress');
+            var position = x - progress.offset().left;
+            var percentage = 100 * position / progress.width();
+            percentage = Math.max(0, Math.min(100, percentage));
+            $("#jquery_jplayer_1").jPlayer("playHead", percentage);
+            $('.jp-play-bar').css('width', percentage + '%');
+        }
+
+        // Sauvegarder l'état à chaque changement
+        $("#jquery_jplayer_1").on($.jPlayer.event.play + ' ' + $.jPlayer.event.pause + ' ' + $.jPlayer.event.seeked, function(event) {
+            saveStateToLocalStorage();
+            console.log("Événement détecté: " + event.type + ", état sauvegardé");
+
+            // Réinitialiser le timeout pour les chansons payantes
+            if (playTimeout) {
+                clearTimeout(playTimeout);
+                playTimeout = null;
+            }
+
+            // Réinitialiser le flag d'écoute complète
+            hasPlayedToEnd = false;
+        });
+
+        // Sauvegarder l'état à intervalles réguliers pendant la lecture
+        setInterval(function() {
+            const jPlayer = $("#jquery_jplayer_1").data("jPlayer");
+            if (jPlayer && !jPlayer.status.paused) {
+                saveStateToLocalStorage();
+            }
+        }, 5000); // Toutes les 5 secondes
+
+        // Sauvegarder l'état avant que l'utilisateur ne quitte la page
+        $(window).on('beforeunload', saveStateToLocalStorage);
+
+        $("#jquery_jplayer_1").on($.jPlayer.event.volumechange, saveStateToLocalStorage);
+        $("#jquery_jplayer_1").on($.jPlayer.event.timeupdate, updateProgressBar);
+        $("#jquery_jplayer_1").on($.jPlayer.event.ended, function() {
+            playTimeout = null; // Réinitialiser le timeout
+        });
+
+        // Restauration après chargement du lecteur
+        $("#jquery_jplayer_1").on($.jPlayer.event.ready, function() {
+            console.log("Lecteur prêt, tentative de restauration");
+            restoreStateFromLocalStorage();
+        });
+
+        // Mise à jour des informations de la chanson en cours
+        $("#jquery_jplayer_1").on($.jPlayer.event.ready + ' ' + $.jPlayer.event.play, function(event) {
+            var single = localStorage.getItem(localStorageKeys.single);
+            if (single) {
+                const singleData = JSON.parse(single);
+                $(".jp-now-playing").html("<div class='jp-track-name'><span class='que_img'><img src='"+singleData.img+"'></span><div class='que_data'>" + singleData.title + " <div class='jp-artist-name'>" + singleData.artist + "</div></div></div>");
+                localStorage.removeItem(localStorageKeys.single);
+            } else {
+                var current = myPlaylist.current;
+                var playlist = myPlaylist.playlist;
+                $.each(playlist, function(index, obj) {
+                    if (index == current) {
+                        $(".jp-now-playing").html("<div class='jp-track-name'><span class='que_img'><img src='"+obj.image+"'></span><div class='que_data'>" + obj.title + " <div class='jp-artist-name'>" + obj.artist + "</div></div></div>");
+                    }
+                });
+            }
+        });
+
+        // Gestion des clics sur les chansons
+        $('body').on('click', '.play-song, .play-single, .play-s1, .play-s2', function() {
+            var singleId = $(this).data('id');
+            var title = $(this).data('title');
+            var artist = $(this).data('artist');
+            var img = $(this).data('img');
+            var mp3 = $(this).data('mp3');
+            var type = $(this).data('type');
+
+            if (title && artist && img && mp3) {
+                currentSongId = singleId;
+                $("#jquery_jplayer_1").jPlayer("setMedia", { mp3, oga: mp3.replace('.mp3', '.ogg') }).jPlayer("play");
+                currentSong = { title, artist, img, mp3, type };
+
+                // Mise à jour des informations sur la barre de lecture
+                $('.jp-track-name').text(title);
+                $('.jp-artist-name').text(artist);
+                $('.jp-cover-art').attr('src', img);
+
+                // Stocker dans localStorage
+                localStorage.setItem(localStorageKeys.single, JSON.stringify({title, artist, img, mp3, type}));
+                console.log('single normale', localStorage.getItem(localStorageKeys.single));
+
+                // Enregistrer le clic sur la chanson
+                $.ajax({
+                    url: "/ecouter-chanson",
+                    type: "POST",
+                    data: {
+                        single_id: singleId,
+                        action: "click",
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        console.log("Nombre de clics mis à jour :", response.nombre_clicks);
+                    },
+                    error: function(xhr) {
+                        console.error("Erreur lors de l'incrémentation des clics", xhr.responseText);
+                    }
+                });
+
+                // Si c'est une chanson payante, mettre en place la limite de 30 secondes
+                if (type === 'payant') {
+                    console.log("Chanson payante détectée, lecture limitée à 30 secondes.");
+                    if (playTimeout) clearTimeout(playTimeout);
+                    playTimeout = setTimeout(function() {
+                        $("#jquery_jplayer_1").jPlayer("pause");
+                        console.log("Lecture arrêtée après 30 secondes pour chanson payante.");
+                        alert("Cette chanson est payante. Abonnez-vous pour écouter en entier.");
+                    }, 30000);
+                }
+            } else {
+                console.error('Données manquantes pour jouer la chanson.');
+            }
+        });
+
+        // Permettre la lecture en cliquant sur le titre
+        $(".single-item__title a, .titl a, .song a").on("click", function(e) {
+            e.preventDefault();
+            $(this).closest(".single-item, .song-card").find(".play-single, .play-s2, .play-s1").trigger("click");
+        });
+
+        // Ajout d'une chanson à la playlist
+        $('.add-to-playlist').on('click', function() {
+            var type = $(this).data('type');
+            if (currentSong.mp3) {
+                if (type === 'payant') {
+                    console.warn("Cette chanson est payante. Veuillez l'acheter avant de l'ajouter à la playlist.");
+                    alert("Cette chanson est payante. Veuillez l'acheter avant de l'ajouter à votre playlist.");
+                    return;
+                }
+
+                const isDuplicate = myPlaylist.playlist.some(track => track.mp3 === currentSong.mp3);
+
+                if (!isDuplicate) {
+                    const songToAdd = {
+                        title: currentSong.title,
+                        artist: currentSong.artist,
+                        mp3: currentSong.mp3,
+                        image: currentSong.img,
+                        type: currentSong.type || 'gratuit',
+                        option: ""
+                    };
+
+                    myPlaylist.add(songToAdd);
+                    $('.playlist-items').append('<li class="playlist-item" data-title="' + currentSong.title + '" data-artist="' + currentSong.artist + '" data-img="' + currentSong.img + '" data-mp3="' + currentSong.mp3 + '">' + currentSong.title + ' - ' + currentSong.artist + '</li>');
+                    savePlaylistToStorage();
+                    alert(currentSong.title + ' - ' + currentSong.artist + ' a été ajouté à la playlist.');
+                } else {
+                    console.warn("Cette chanson est déjà dans la playlist.");
+                    alert("Cette chanson est déjà dans la playlist.");
+                }
+            } else {
+                console.error('Aucune chanson en cours de lecture à ajouter.');
+                alert('Aucune chanson en cours de lecture à ajouter.');
+            }
+        });
+
+        // Ajout d'une chanson depuis un bouton dédié
+        $('.add').on('click', function() {
+            var songId = $(this).data('id');
+            var title = $(this).data('title');
+            var artist = $(this).data('artist');
+            var mp3 = $(this).data('mp3');
+            var img = $(this).data('img');
+            var type = $(this).data('type');
+
+            if (mp3) {
+                if (type === 'payant') {
+                    console.warn("Cette chanson est payante. Veuillez l'acheter avant de l'ajouter à la playlist.");
+                    alert("Cette chanson est payante. Veuillez l'acheter avant de l'ajouter à votre playlist.");
+                    return;
+                }
+
+                const isDuplicate = myPlaylist.playlist.some(track => track.mp3 === mp3);
+
+                if (!isDuplicate) {
+                    var song = {
+                        id: songId,
+                        title: title,
+                        artist: artist,
+                        mp3: mp3,
+                        image: img,
+                        type: type || 'gratuit',
+                        option: ""
+                    };
+
+                    myPlaylist.add(song);
+                    $('.playlist-items').append('<li class="playlist-item" data-title="' + title + '" data-artist="' + artist + '" data-img="' + img + '" data-mp3="' + mp3 + '">' + title + ' - ' + artist + '</li>');
+                    savePlaylistToStorage();
+                    alert(title + ' - ' + artist + ' a été ajouté à la playlist.');
+                } else {
+                    console.warn("Cette chanson est déjà dans la playlist.");
+                    alert("Cette chanson est déjà dans la playlist.");
+                }
+            } else {
+                console.error('Aucune chanson en cours de lecture à ajouter.');
+                alert('Aucune chanson en cours de lecture à ajouter.');
+            }
+        });
+
+        // Réinitialisation de la playlist
+        $('.ms_clear').on('click', function() {
+            if (confirm("Voulez-vous vraiment réinitialiser la playlist ?")) {
+                myPlaylist.setPlaylist(defaultPlaylist);
+                localStorage.setItem(localStorageKeys.playlist, JSON.stringify(defaultPlaylist));
+                alert("Playlist réinitialisée.");
+            }
+        });
+
+        // Sauvegarde manuelle de la playlist
+        $('#save-playlist').on('click', savePlaylistToStorage);
+
+        // Fonctionnalité de partage
         $('.action-btn.share').on('click', function(event) {
             event.preventDefault();
             var title = $(this).closest('.song-card').data('title');
             var artist = $(this).closest('.song-card').data('artist');
             var coverUrl = $(this).closest('.song-card').data('cover');
-            var shareText = 'Écoutez "' + title + '" par ' + artist + ' sur Heavenly Praise!' + coverUrl;
+            var shareText = 'Écoutez "' + title + '" par ' + artist + ' sur Heavenly Praise!';
             var shareUrl = window.location.href;
+            var type = $(this).data('type');
+
+            // Vérification si la chanson est payante
+            if (type === 'payant') {
+                console.warn("Le partage de cette chanson est restreint car elle est payante.");
+                alert("Cette chanson est payante et ne peut pas être partagée publiquement.");
+                return;
+            }
 
             if (navigator.share) {
                 navigator.share({
@@ -672,9 +819,930 @@
                 alert('Fonctionnalité de partage non supportée sur ce navigateur.');
             }
         });
-    });
 
+        // Gestion des likes
+        $('.action-btn.like').on('click', function(event) {
+            event.preventDefault();
+            var likeButton = $(this);
+            var likeCountElement = likeButton.siblings('.like-count');
+            var singleId = likeButton.data('id');
+            var type = $(this).data('type');
+
+            // Bloquer le like pour les singles payants
+            if (type === 'payant') {
+                console.warn("Le like de cette chanson est restreint car elle est payante.");
+                alert("Cette chanson est payante. Vous devez l'acheter avant de pouvoir l'aimer.");
+                return;
+            }
+
+            $.ajax({
+                url: "/toggle-like",
+                type: "POST",
+                data: {
+                    single_id: singleId,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        likeCountElement.text(response.nombre_aimes);
+                        alert(response.message);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Erreur lors de la mise à jour des likes", xhr.responseText);
+                }
+            });
+        });
+
+        // Gestion des téléchargements
+        $('.action-btn.tele').on('click', function(event) {
+            event.preventDefault();
+
+            var songTitle = $(this).attr('data-title') || 'Chanson';
+            var artist = $(this).attr('data-artist') || 'Artiste inconnu';
+            var mp3Url = $(this).attr('data-mp3');
+            var type = $(this).data('type');
+
+            if (!mp3Url) {
+                alert("Le fichier audio est introuvable.");
+                return;
+            }
+
+            // Bloquer le téléchargement pour les singles payants
+            if (type === 'payant') {
+                console.warn("Le téléchargement de cette chanson est restreint car elle est payante.");
+                alert("Cette chanson est payante. Vous devez l'acheter avant de pouvoir la télécharger.");
+                return;
+            }
+
+            // Créer un lien de téléchargement
+            var downloadLink = document.createElement("a");
+            downloadLink.href = mp3Url;
+            downloadLink.download = songTitle + " - " + artist + ".mp3";
+            document.body.appendChild(downloadLink);
+
+            // Déclencher le téléchargement
+            downloadLink.click();
+
+            // Nettoyer après téléchargement
+            document.body.removeChild(downloadLink);
+        });
+    }
+});
+</script>  -->
+
+<script>
+    $(document).ready(function() {
+    if ($('.audio-player').length) {
+        // Définition des clés de stockage local
+        const localStorageKeys = {
+            volume: 'audio_player_volume',
+            currentTrack: 'audio_player_current_track',
+            currentTime: 'audio_player_current_time',
+            playlist: 'audio_player_playlist',
+            progress: 'audio_player_progress',
+            currentMinutes: 'audio_player_current_minutes',
+            currentSeconds: 'audio_player_current_seconds',
+            isPlaying: 'audio_player_is_playing',
+            single: 'audio_player_single'
+        };
+
+        // Variables de gestion du lecteur
+        let currentSong = {}; // Objet pour stocker la chanson en cours
+        let currentSongId = null; // Variable pour stocker l'ID de la chanson en cours
+        let hasPlayedToEnd = false; // Flag pour suivre si la chanson a été lue jusqu'à la fin
+        let playTimeout = null; // Pour gérer la limite de lecture des chansons payantes
+        let previousState = {}; // Pour optimiser les sauvegardes d'état
+
+        // Playlist par défaut avec un son d'accueil
+        const defaultPlaylist = [
+            {
+                image: '{{ asset("usx_files/covers/cover-default.jpg") }}',
+                title: "Bienvenue",
+                artist: "Heavenly Praise",
+                // mp3: '{{ asset("usx_files/songs/welcome-heavenly-praise.mp3") }}',
+                mp3: "https://heavenly-praise.com/usx_files/songs/welcome-heavenly-praise.mp3",
+                type: "gratuit",
+                option: ""
+            }
+        ];
+
+        // Récupération de la playlist depuis localStorage ou utilisation de la playlist par défaut
+        const savedPlaylist = localStorage.getItem(localStorageKeys.playlist);
+        const singlefromStorage = localStorage.getItem(localStorageKeys.single);
+        console.log('Données single chargées:', singlefromStorage);
+
+        const single = singlefromStorage ? JSON.parse(singlefromStorage) : null;
+        const playlistData = !single && savedPlaylist ? JSON.parse(savedPlaylist) : single ? [
+            {
+                ...single,
+                image: single.img,
+                option: ""
+            }
+        ] : defaultPlaylist;
+
+        console.log('Playlist chargée:', playlistData);
+
+        // Initialisation du lecteur avec la playlist récupérée
+        const myPlaylist = new jPlayerPlaylist({
+            jPlayer: "#jquery_jplayer_1",
+            cssSelectorAncestor: "#jp_container_1"
+        }, playlistData, {
+            swfPath: "PlayerTemplate/js/plugins",
+            supplied: "mp3",
+            wmode: "window",
+            useStateClassSkin: true,
+            autoBlur: false,
+            smoothPlayBar: true,
+            keyEnabled: true,
+            playlistOptions: {
+                autoPlay: false
+            }
+        });
+
+        /**
+         * Sauvegarde la playlist actuelle dans le stockage local
+         */
+        function savePlaylistToStorage() {
+            try {
+                localStorage.setItem(localStorageKeys.playlist, JSON.stringify(myPlaylist.playlist));
+                console.log("Playlist sauvegardée avec succès");
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde de la playlist:", error);
+            }
+        }
+
+        /**
+         * Sauvegarde l'état complet du lecteur dans le stockage local
+         */
+        function saveStateToLocalStorage() {
+            try {
+                const current = myPlaylist.current;
+                const jPlayer = $("#jquery_jplayer_1").data("jPlayer");
+
+                if (!jPlayer || !jPlayer.status) return; // Protection contre les erreurs
+
+                const currentTime = jPlayer.status.currentTime || 0;
+                const volume = jPlayer.options.volume || 1;
+                const duration = jPlayer.status.duration || 1; // Éviter division par zéro
+                const progress = (currentTime / duration) * 100; // Pourcentage de progression
+                const currentMinutes = Math.floor(currentTime / 60); // Minutes écoulées
+                const currentSeconds = Math.floor(currentTime % 60); // Secondes écoulées
+                const isPlaying = !jPlayer.status.paused; // État de lecture (play/pause)
+
+                // Construire l'état actuel pour comparaison
+                const currentState = {
+                    track: current,
+                    time: currentTime,
+                    volume: volume,
+                    isPlaying: isPlaying
+                };
+
+                // Ne sauvegarder que si l'état a changé
+                if (JSON.stringify(previousState) !== JSON.stringify(currentState)) {
+                    localStorage.setItem(localStorageKeys.currentTrack, current);
+                    localStorage.setItem(localStorageKeys.currentTime, currentTime);
+                    localStorage.setItem(localStorageKeys.volume, volume);
+                    localStorage.setItem(localStorageKeys.progress, progress);
+                    localStorage.setItem(localStorageKeys.currentMinutes, currentMinutes);
+                    localStorage.setItem(localStorageKeys.currentSeconds, currentSeconds);
+                    localStorage.setItem(localStorageKeys.isPlaying, isPlaying);
+
+                    previousState = currentState;
+                    console.log("État du lecteur sauvegardé: Temps=" + currentTime + "s, Progression=" + progress.toFixed(1) + "%, En lecture=" + isPlaying);
+                }
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde de l'état:", error);
+            }
+        }
+
+        /**
+         * Restaure l'état du lecteur depuis le stockage local
+         */
+        function restoreStateFromLocalStorage() {
+            try {
+                const currentTrackIndex = localStorage.getItem(localStorageKeys.currentTrack);
+                const currentTime = localStorage.getItem(localStorageKeys.currentTime);
+                const savedVolume = localStorage.getItem(localStorageKeys.volume);
+                const isPlaying = localStorage.getItem(localStorageKeys.isPlaying) === 'true';
+
+                console.log("Tentative de restauration: Piste=" + currentTrackIndex + ", Temps=" + currentTime + "s, En lecture=" + isPlaying);
+
+                if (savedVolume !== null) {
+                    $("#jquery_jplayer_1").jPlayer("volume", parseFloat(savedVolume));
+                }
+
+                if (currentTrackIndex !== null && playlistData.length > 0) {
+                    const trackIndex = parseInt(currentTrackIndex, 10);
+
+                    if (!isNaN(trackIndex) && trackIndex >= 0 && trackIndex < myPlaylist.playlist.length) {
+                        // Sélectionner la piste mais ne pas la lire automatiquement
+                        console.log("Sélection de la piste " + trackIndex);
+                        myPlaylist.select(trackIndex);
+
+                        // Attendre que le média soit chargé avant de définir la position
+                        $("#jquery_jplayer_1").one($.jPlayer.event.loadeddata, function() {
+                            console.log("Média chargé, définition de la position à " + currentTime + "s");
+                            if (currentTime !== null) {
+                                // Définir la position exacte en secondes
+                                $("#jquery_jplayer_1").jPlayer("play", parseFloat(currentTime));
+
+                                // Si la chanson n'était pas en cours de lecture, mettre en pause immédiatement
+                                if (!isPlaying) {
+                                    setTimeout(function() {
+                                        $("#jquery_jplayer_1").jPlayer("pause");
+                                        console.log("Pause automatique appliquée");
+                                    }, 50);
+                                }
+                            }
+                        });
+
+                        // Fallback si loadeddata ne se déclenche pas
+                        setTimeout(function() {
+                            if (currentTime !== null) {
+                                console.log("Fallback: définition de la position à " + currentTime + "s");
+                                $("#jquery_jplayer_1").jPlayer("play", parseFloat(currentTime));
+
+                                if (!isPlaying) {
+                                    setTimeout(function() {
+                                        $("#jquery_jplayer_1").jPlayer("pause");
+                                    }, 50);
+                                }
+                            }
+                        }, 1500);
+                    }
+                }
+
+                updateProgressDisplay();
+            } catch (error) {
+                console.error("Erreur lors de la restauration de l'état:", error);
+                // Tenter à nouveau après un délai
+                setTimeout(restoreStateFromLocalStorage, 1000);
+            }
+        }
+
+        /**
+         * Mise à jour visuelle de la barre de progression
+         */
+        function updateProgressDisplay() {
+            try {
+                const savedProgress = localStorage.getItem(localStorageKeys.progress);
+                const savedMinutes = localStorage.getItem(localStorageKeys.currentMinutes);
+                const savedSeconds = localStorage.getItem(localStorageKeys.currentSeconds);
+
+                if (savedProgress !== null) {
+                    $('.jp-play-bar').css('width', savedProgress + '%');
+                }
+
+                if (savedMinutes !== null && savedSeconds !== null) {
+                    const formattedSeconds = savedSeconds < 10 ? '0' + savedSeconds : savedSeconds;
+                    $('.jp-current-time').text(savedMinutes + ':' + formattedSeconds);
+                }
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de l'affichage:", error);
+            }
+        }
+
+        /**
+         * Mise à jour dynamique de la barre de progression pendant la lecture
+         */
+        function updateProgressBar() {
+            try {
+                const jPlayer = $("#jquery_jplayer_1").data("jPlayer");
+                if (!jPlayer || !jPlayer.status) return; // Protection contre les erreurs
+
+                const currentTime = jPlayer.status.currentTime || 0;
+                const duration = jPlayer.status.duration || 1; // Éviter division par zéro
+                const percentage = (currentTime / duration) * 100;
+                const currentMinutes = Math.floor(currentTime / 60);
+                const currentSeconds = Math.floor(currentTime % 60);
+
+                // Formater le temps pour l'affichage (MM:SS)
+                const formattedSeconds = currentSeconds < 10 ? '0' + currentSeconds : currentSeconds;
+                const formattedTime = currentMinutes + ':' + formattedSeconds;
+
+                // Mettre à jour l'affichage visuel
+                $('.jp-play-bar').css('width', percentage + '%');
+                $('.jp-current-time').text(formattedTime);
+
+                // Sauvegarder les informations précises
+                localStorage.setItem(localStorageKeys.currentTime, currentTime.toString());
+                localStorage.setItem(localStorageKeys.progress, percentage.toString());
+                localStorage.setItem(localStorageKeys.currentMinutes, currentMinutes.toString());
+                localStorage.setItem(localStorageKeys.currentSeconds, currentSeconds.toString());
+
+                // Vérifier si on est à la fin de la chanson
+                if (currentTime >= duration - 0.5 && !hasPlayedToEnd && currentSongId) {
+                    hasPlayedToEnd = true;
+                    console.log("Chanson terminée, comptabilisation de l'écoute");
+                    registerListening("ecoute", currentSongId);
+                }
+
+                // Vérifier pour les chansons payantes
+                const currentTrack = myPlaylist.playlist[myPlaylist.current];
+                if (currentTrack && currentTrack.type === 'payant' && currentTime > 30) {
+                    // S'assurer que le timeout est nettoyé avant d'en créer un nouveau
+                    if (playTimeout) clearTimeout(playTimeout);
+
+                    playTimeout = setTimeout(function() {
+                        $("#jquery_jplayer_1").jPlayer("pause");
+                        alert("Cette chanson est payante. Abonnez-vous pour écouter en entier.");
+                    }, 100); // Presque immédiat à ce stade
+                }
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de la barre de progression:", error);
+            }
+        }
+
+        /**
+         * Gestion du bouton de volume rotatif
+         */
+        $('.knob-wrapper').mousedown(function() {
+            $(window).mousemove(function(e) {
+                try {
+                    var angle1 = getRotationDegrees($('.knob')),
+                    volume = angle1 / 270;
+
+                    if (volume > 1) {
+                        $("#jquery_jplayer_1").jPlayer("volume", 1);
+                    } else if (volume <= 0) {
+                        $("#jquery_jplayer_1").jPlayer("mute");
+                    } else {
+                        $("#jquery_jplayer_1").jPlayer("volume", volume);
+                        $("#jquery_jplayer_1").jPlayer("unmute");
+                    }
+                } catch (error) {
+                    console.error("Erreur de contrôle du volume:", error);
+                }
+            });
+
+            return false;
+        }).mouseup(function() {
+            $(window).unbind("mousemove");
+        });
+
+        /**
+         * Gestion du drag de la barre de progression
+         */
+        var timeDrag = false;
+        $('.jp-seek-bar').mousedown(function(e) {
+            timeDrag = true;
+            updatebar(e.pageX);
+        });
+
+        $(document).mouseup(function(e) {
+            if (timeDrag) {
+                timeDrag = false;
+                updatebar(e.pageX);
+                // Sauvegarder l'état après le déplacement manuel
+                setTimeout(saveStateToLocalStorage, 100);
+            }
+        });
+
+        $(document).mousemove(function(e) {
+            if (timeDrag) {
+                updatebar(e.pageX);
+            }
+        });
+
+        /**
+         * Met à jour la position de lecture en fonction de la position du clic
+         */
+        function updatebar(x) {
+            try {
+                var progress = $('.jp-progress');
+                var position = x - progress.offset().left;
+                var percentage = 100 * position / progress.width();
+                percentage = Math.max(0, Math.min(100, percentage));
+                $("#jquery_jplayer_1").jPlayer("playHead", percentage);
+                $('.jp-play-bar').css('width', percentage + '%');
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour de la barre:", error);
+            }
+        }
+
+        /**
+         * Ajoute une chanson à la playlist
+         */
+        function addSongToPlaylist(songData) {
+            try {
+                if (!songData || !songData.mp3) {
+                    alert('Données de chanson incomplètes');
+                    return false;
+                }
+
+                if (songData.type === 'payant') {
+                    alert("Cette chanson est payante. Veuillez l'acheter avant de l'ajouter à votre playlist.");
+                    return false;
+                }
+
+                const isDuplicate = myPlaylist.playlist.some(track => track.mp3 === songData.mp3);
+                if (isDuplicate) {
+                    alert("Cette chanson est déjà dans la playlist.");
+                    return false;
+                }
+
+                // Ajout à la playlist
+                const song = {
+                    id: songData.id || null,
+                    title: songData.title,
+                    artist: songData.artist,
+                    mp3: songData.mp3,
+                    image: songData.img,
+                    type: songData.type || 'gratuit',
+                    option: ""
+                };
+
+                myPlaylist.add(song);
+                $('.playlist-items').append('<li class="playlist-item" data-title="' + songData.title + '" data-artist="' + songData.artist + '" data-img="' + songData.img + '" data-mp3="' + songData.mp3 + '">' + songData.title + ' - ' + songData.artist + '</li>');
+                savePlaylistToStorage();
+                alert(songData.title + ' - ' + songData.artist + ' a été ajouté à la playlist.');
+                return true;
+            } catch (error) {
+                console.error("Erreur lors de l'ajout à la playlist:", error);
+                return false;
+            }
+        }
+
+        /**
+         * Gestion des événements du lecteur (play, pause, etc.)
+         */
+        $("#jquery_jplayer_1").on($.jPlayer.event.play + ' ' + $.jPlayer.event.pause + ' ' + $.jPlayer.event.seeked, function(event) {
+            saveStateToLocalStorage();
+            console.log("Événement détecté: " + event.type + ", état sauvegardé");
+
+            // Réinitialiser le timeout pour les chansons payantes
+            if (playTimeout) {
+                clearTimeout(playTimeout);
+                playTimeout = null;
+            }
+
+            // Réinitialiser le flag d'écoute complète au début de la lecture
+            if (event.type === $.jPlayer.event.play) {
+                hasPlayedToEnd = false;
+            }
+
+            // Réinitialiser le flag d'écoute si l'utilisateur revient en arrière dans la chanson
+            if (event.type === $.jPlayer.event.seeked) {
+                const jPlayer = $("#jquery_jplayer_1").data("jPlayer");
+                if (jPlayer && jPlayer.status) {
+                    const currentTime = jPlayer.status.currentTime || 0;
+                    const duration = jPlayer.status.duration || 1;
+
+                    // Si l'utilisateur revient à moins de 80% de la chanson, réinitialiser le flag
+                    if (currentTime < duration * 0.8) {
+                        hasPlayedToEnd = false;
+                        console.log("Seek en arrière détecté, réinitialisation du flag d'écoute");
+                    }
+                }
+            }
+        });
+
+        /**
+         * Sauvegarder l'état périodiquement pendant la lecture
+         */
+        setInterval(function() {
+            const jPlayer = $("#jquery_jplayer_1").data("jPlayer");
+            if (jPlayer && !jPlayer.status.paused) {
+                saveStateToLocalStorage();
+            }
+        }, 5000);
+
+        /**
+         * Sauvegarder l'état avant que l'utilisateur ne quitte la page
+         */
+        $(window).on('beforeunload', saveStateToLocalStorage);
+
+        /**
+         * Événements supplémentaires du lecteur
+         */
+        $("#jquery_jplayer_1").on($.jPlayer.event.volumechange, saveStateToLocalStorage);
+        $("#jquery_jplayer_1").on($.jPlayer.event.timeupdate, updateProgressBar);
+        $("#jquery_jplayer_1").on($.jPlayer.event.ended, function() {
+            playTimeout = null; // Réinitialiser le timeout
+            hasPlayedToEnd = false; // Réinitialiser le flag d'écoute
+
+            // Vérifier si l'écoute a été comptabilisée, sinon la comptabiliser maintenant
+            if (!hasPlayedToEnd && currentSongId) {
+                console.log("Événement ended déclenché - comptabilisation de l'écoute");
+                registerListening("ecoute", currentSongId);
+            }
+        });
+
+        /**
+         * Restauration après chargement du lecteur
+         */
+        $("#jquery_jplayer_1").on($.jPlayer.event.ready, function() {
+            console.log("Lecteur prêt, tentative de restauration");
+            restoreStateFromLocalStorage();
+        });
+
+        /**
+         * Mise à jour des informations de la chanson en cours
+         */
+        $("#jquery_jplayer_1").on($.jPlayer.event.ready + ' ' + $.jPlayer.event.play, function(event) {
+            try {
+                var single = localStorage.getItem(localStorageKeys.single);
+                if (single) {
+                    const singleData = JSON.parse(single);
+                    $(".jp-now-playing").html("<div class='jp-track-name'><span class='que_img'><img src='"+singleData.img+"'></span><div class='que_data'>" + singleData.title + " <div class='jp-artist-name'>" + singleData.artist + "</div></div></div>");
+                    localStorage.removeItem(localStorageKeys.single);
+                } else {
+                    var current = myPlaylist.current;
+                    var playlist = myPlaylist.playlist;
+                    $.each(playlist, function(index, obj) {
+                        if (index == current) {
+                            $(".jp-now-playing").html("<div class='jp-track-name'><span class='que_img'><img src='"+obj.image+"'></span><div class='que_data'>" + obj.title + " <div class='jp-artist-name'>" + obj.artist + "</div></div></div>");
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour des informations de chanson:", error);
+            }
+        });
+
+        // Add this near the top with your other variables
+        let clickDebounceTimer = null;
+        const CLICK_DEBOUNCE_TIME = 5000; // 5 seconds between click counts for the same song
+        const listenedSongsKey = 'listened_songs';
+
+        // Improved registerListening function with debounce for clicks
+        function registerListening(action, songId) {
+            if (!songId) {
+                console.error("ID de chanson manquant pour l'enregistrement");
+                return;
+            }
+
+            // For click actions, implement debounce
+            if (action === "click") {
+                // Clear any existing timer
+                if (clickDebounceTimer) {
+                    clearTimeout(clickDebounceTimer);
+                }
+
+                // Check if this song was clicked recently
+                const clickedSongs = JSON.parse(localStorage.getItem('clicked_songs') || '{}');
+                const lastClickTime = clickedSongs[songId] || 0;
+                const currentTime = new Date().getTime();
+
+                // If it's been less than the debounce time, don't count this click
+                if (currentTime - lastClickTime < CLICK_DEBOUNCE_TIME) {
+                    console.log("Click ignored - debounce in effect for song ID " + songId);
+                    return;
+                }
+
+                // Update the last click time for this song
+                clickedSongs[songId] = currentTime;
+                localStorage.setItem('clicked_songs', JSON.stringify(clickedSongs));
+
+                // Set the debounce timer
+                clickDebounceTimer = setTimeout(() => {
+                    clickDebounceTimer = null;
+                }, CLICK_DEBOUNCE_TIME);
+            }
+
+            // For listen actions, check if the song has been listened to recently
+            if (action === "ecoute") {
+                const listenedSongs = JSON.parse(localStorage.getItem(listenedSongsKey) || '{}');
+                const lastListenTime = listenedSongs[songId] || 0;
+                const currentTime = new Date().getTime();
+
+                // Don't count if listened within the last hour (3600000 ms)
+                if (currentTime - lastListenTime < 3600000) {
+                    console.log("Listen ignored - already counted in the last hour for song ID " + songId);
+                    return;
+                }
+
+                // Update the last listen time
+                listenedSongs[songId] = currentTime;
+                localStorage.setItem(listenedSongsKey, JSON.stringify(listenedSongs));
+            }
+
+            // Make the AJAX call to register the action
+            $.ajax({
+                url: "/ecouter-chanson",
+                type: "POST",
+                data: {
+                    single_id: songId,
+                    action: action,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        console.log("Action " + action + " enregistrée avec succès:", response);
+
+                        // Update UI counters if needed
+                        if (action === "ecoute") {
+                            $('#hit-count').text(response.nombre_ecoutes + (response.nombre_ecoutes > 1 ? ' Écoutes' : ' Écoute'));
+                        } else if (action === "click") {
+                            $('#click-count').text(response.nombre_clicks + (response.nombre_clicks > 1 ? ' Clicks' : ' Click'));
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Erreur lors de l'enregistrement de l'action " + action, xhr.responseText);
+                }
+            });
+        }
+
+        /**
+         * Gestion des clics sur les chansons
+         */
+        $('body').on('click', '.play-song, .play-single, .play-s1, .play-s2', function() {
+            try {
+                var singleId = $(this).data('id');
+                var title = $(this).data('title');
+                var artist = $(this).data('artist');
+                var img = $(this).data('img');
+                var mp3 = $(this).data('mp3');
+                var type = $(this).data('type');
+
+                if (title && artist && img && mp3) {
+                    currentSongId = singleId;
+                    // Réinitialiser le flag d'écoute lors du changement de chanson
+                    hasPlayedToEnd = false;
+
+                    $("#jquery_jplayer_1").jPlayer("setMedia", { mp3, oga: mp3.replace('.mp3', '.ogg') }).jPlayer("play");
+                    currentSong = { title, artist, img, mp3, type };
+
+                    // Mise à jour des informations sur la barre de lecture
+                    $('.jp-track-name').text(title);
+                    $('.jp-artist-name').text(artist);
+                    $('.jp-cover-art').attr('src', img);
+
+                    // Stocker dans localStorage
+                    localStorage.setItem(localStorageKeys.single, JSON.stringify({title, artist, img, mp3, type}));
+
+                    // Enregistrer le clic sur la chanson
+                    if (singleId) {
+                        registerListening("click", singleId);
+                    }
+
+                    // Si c'est une chanson payante, mettre en place la limite de 30 secondes
+                    if (type === 'payant') {
+                        console.log("Chanson payante détectée, lecture limitée à 30 secondes.");
+                        if (playTimeout) clearTimeout(playTimeout);
+                        playTimeout = setTimeout(function() {
+                            $("#jquery_jplayer_1").jPlayer("pause");
+                            console.log("Lecture arrêtée après 30 secondes pour chanson payante.");
+                            alert("Cette chanson est payante. Abonnez-vous pour écouter en entier.");
+                        }, 30000);
+                    }
+                } else {
+                    console.error('Données manquantes pour jouer la chanson.');
+                }
+            } catch (error) {
+                console.error("Erreur lors de la lecture de la chanson:", error);
+            }
+
+        });
+
+        $("#jquery_jplayer_1").on($.jPlayer.event.ended, function() {
+            const player = $("#jquery_jplayer_1").data("jPlayer").status;
+            if (player.currentTime >= player.duration - 1 && !hasPlayedToEnd && currentSongId) {
+                hasPlayedToEnd = true;
+
+                $.ajax({
+                    url: "/ecouter-chanson",
+                    type: "POST",
+                    data: {
+                        single_id: currentSongId,
+                        action: "ecoute",
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            console.log("Nombre d'écoutes mis à jour :", response.nombre_ecoutes);
+                            $('#hit-count').text(response.nombre_ecoutes + (response.nombre_ecoutes > 1 ? ' Écoutes' : ' Écoute'));
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error("Erreur lors de l'incrémentation des écoutes", xhr.responseText);
+                    }
+                });
+            }
+        });
+
+
+        /**
+         * Permettre la lecture en cliquant sur le titre
+         */
+        $(".single-item__title a, .titl a, .song a").on("click", function(e) {
+            e.preventDefault();
+            $(this).closest(".single-item, .song-card").find(".play-single, .play-s2, .play-s1").trigger("click");
+        });
+
+        /**
+         * Ajout de la chanson en cours à la playlist
+         */
+        $('.add-to-playlist').on('click', function() {
+            var type = $(this).data('type');
+            if (currentSong.mp3) {
+                addSongToPlaylist(currentSong);
+            } else {
+                console.error('Aucune chanson en cours de lecture à ajouter.');
+                alert('Aucune chanson en cours de lecture à ajouter.');
+            }
+        });
+
+        /**
+         * Ajout d'une chanson depuis un bouton dédié
+         */
+        $('.add').on('click', function() {
+            var songData = {
+                id: $(this).data('id'),
+                title: $(this).data('title'),
+                artist: $(this).data('artist'),
+                mp3: $(this).data('mp3'),
+                img: $(this).data('img'),
+                type: $(this).data('type')
+            };
+
+            addSongToPlaylist(songData);
+        });
+
+        /**
+         * Réinitialisation de la playlist
+         */
+        $('.ms_clear').on('click', function() {
+            if (confirm("Voulez-vous vraiment réinitialiser la playlist ?")) {
+                myPlaylist.setPlaylist(defaultPlaylist);
+                localStorage.setItem(localStorageKeys.playlist, JSON.stringify(defaultPlaylist));
+                alert("Playlist réinitialisée.");
+            }
+        });
+
+        /**
+         * Sauvegarde manuelle de la playlist
+         */
+        $('#save-playlist').on('click', savePlaylistToStorage);
+
+        /**
+         * Gestion du partage de chansons
+         */
+        $('.action-btn.share').on('click', function(event) {
+            event.preventDefault();
+            try {
+                var title = $(this).closest('.song-card').data('title');
+                var artist = $(this).closest('.song-card').data('artist');
+                var coverUrl = $(this).closest('.song-card').data('cover');
+                var shareText = 'Écoutez "' + title + '" par ' + artist + ' sur Heavenly Praise!';
+                var shareUrl = window.location.href;
+                var type = $(this).data('type');
+
+                // Vérification si la chanson est payante
+                if (type === 'payant') {
+                    console.warn("Le partage de cette chanson est restreint car elle est payante.");
+                    alert("Cette chanson est payante et ne peut pas être partagée publiquement.");
+                    return;
+                }
+
+                if (navigator.share) {
+                    navigator.share({
+                        title: title,
+                        text: shareText,
+                        url: shareUrl
+                    }).then(() => {
+                        console.log('Partage réussi');
+                    }).catch((error) => {
+                        console.error('Erreur de partage:', error);
+                    });
+                } else {
+                    // Solution de repli pour les navigateurs qui ne supportent pas l'API de partage
+                    alert('Fonctionnalité de partage non supportée sur ce navigateur.');
+                }
+            } catch (error) {
+                console.error("Erreur lors du partage:", error);
+            }
+        });
+
+        /**
+         * Gestion des likes
+         */
+        // $('.action-btn.like').on('click', function(event) {
+        //     event.preventDefault();
+        //     try {
+        //         var likeButton = $(this);
+        //         var likeCountElement = likeButton.siblings('.like-count');
+        //         var singleId = likeButton.data('id');
+        //         var type = $(this).data('type');
+
+        //         // Bloquer le like pour les singles payants
+        //         if (type === 'payant') {
+        //             console.warn("Le like de cette chanson est restreint car elle est payante.");
+        //             alert("Cette chanson est payante. Vous devez l'acheter avant de pouvoir l'aimer.");
+        //             return;
+        //         }
+
+        //         if (!singleId) {
+        //             console.error("ID de chanson manquant pour le like");
+        //             return;
+        //         }
+
+        //         $.ajax({
+        //             url: "/toggle-like",
+        //             type: "POST",
+        //             data: {
+        //                 single_id: singleId,
+        //                 _token: $('meta[name="csrf-token"]').attr('content')
+        //             },
+        //             success: function(response) {
+        //                 if (response.success) {
+        //                     likeCountElement.text(response.nombre_aimes);
+        //                     alert(response.message);
+        //                 } else {
+        //                     alert(response.message);
+        //                 }
+        //             },
+        //             error: function(xhr) {
+        //                 console.error("Erreur lors de la mise à jour des likes", xhr.responseText);
+        //             }
+        //         });
+        //     } catch (error) {
+        //         console.error("Erreur lors du like:", error);
+        //     }
+        // });
+
+        $('.action-btn.like').on('click', function(event) {
+            event.preventDefault();
+            var likeButton = $(this);
+            var likeCountElement = likeButton.siblings('.like-count');
+            var singleId = likeButton.data('id');
+            var type = likeButton.data('type');
+
+            if (type === 'payant') {
+                console.warn("Le like de cette chanson est restreint car elle est payante.");
+                alert("Cette chanson est payante. Vous devez l'acheter avant de pouvoir l'aimer.");
+                return;
+            }
+
+            $.ajax({
+                url: "/toggle-like",
+                type: "POST",
+                data: {
+                    single_id: singleId,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        likeCountElement.text(response.nombre_aimes);
+                        alert(response.message);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Erreur lors de la mise à jour des likes", xhr.responseText);
+                }
+            });
+        });
+
+
+        /**
+         * Gestion des téléchargements
+         */
+        $('.action-btn.tele').on('click', function(event) {
+            event.preventDefault();
+            try {
+                var songTitle = $(this).attr('data-title') || 'Chanson';
+                var artist = $(this).attr('data-artist') || 'Artiste inconnu';
+                var mp3Url = $(this).attr('data-mp3');
+                var type = $(this).data('type');
+
+                if (!mp3Url) {
+                    alert("Le fichier audio est introuvable.");
+                    return;
+                }
+
+                // Bloquer le téléchargement pour les singles payants
+                if (type === 'payant') {
+                    console.warn("Le téléchargement de cette chanson est restreint car elle est payante.");
+                    alert("Cette chanson est payante. Vous devez l'acheter avant de pouvoir la télécharger.");
+                    return;
+                }
+
+                // Créer un lien de téléchargement
+                var downloadLink = document.createElement("a");
+                downloadLink.href = mp3Url;
+                downloadLink.download = songTitle + " - " + artist + ".mp3";
+                document.body.appendChild(downloadLink);
+
+                // Déclencher le téléchargement
+                downloadLink.click();
+
+                // Nettoyer après téléchargement
+                document.body.removeChild(downloadLink);
+            } catch (error) {
+                console.error("Erreur lors du téléchargement:", error);
+            }
+        });
+    }
+});
 </script>
+
+
 
 	@hasSection ('js')
 		@yield('js')

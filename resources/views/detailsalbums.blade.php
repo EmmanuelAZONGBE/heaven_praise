@@ -77,12 +77,13 @@
                                         @forelse ($singles as $single)
                                             <li class="single-item hover-details  d-flex align-items-center mb-3">
                                                 <a href="javascript:;"
-                                                    class="position-relative jp-playlist-item play-single "
+                                                    class="position-relative jp-playlist-item play-single type-payant"
                                                     data-id="{{ $single->id }}" data-artiste-id="{{ $artistes->id }}"
                                                     data-title="{{ $i }}. {{ $single->titre }}"
                                                     data-artist="{{ $single->User->nomartiste }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                    data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
+                                                    data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
+                                                    data-type="{{ $single->type }}">
                                                     <span
                                                         class="single-item__cover d-flex align-items-center justify-content-center bg-light rounded-circle shadow-sm"
                                                         style="width: 50px; height: 50px; overflow: hidden;">
@@ -99,13 +100,45 @@
                                                     </span>
                                                 </a>
                                                 <div class="single-item__title ml-3">
-                                                    <h4 class="mb-1" style="font-size: 14px;">
+                                                    <h4 class="mb-1" style="font-size: 14px; margin-left: 1px;">
                                                         <a href="#">{{ $i }}. {{ $single->titre }}</a>
                                                     </h4>
-                                                    <span style="font-size: 12px;">
+                                                    <span style="font-size: 12px; margin-left: 12px">
                                                         <a
                                                             href="{{ route('detailsartistes', ['heavenid' => $single->User->heavenid]) }}">{{ $single->User->nomartiste }}</a>
                                                     </span>
+                                                    <div class=" d-flex align-items-center">
+                                                        <a href="javascript:;" class="add"
+                                                            style="font-size: 14px; margin-left: px;"
+                                                            data-title="{{ $single->titre }}"
+                                                            data-type="{{ $single->type }}"
+                                                            data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
+                                                            data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                            data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                width="24" height="24"
+                                                                aria-label="Ajouter à la playlist">
+                                                                <path
+                                                                    d="M19,11H13V5a1,1,0,0,0-2,0v6H5a1,1,0,0,0,0,2h6v6a1,1,0,0,0,2,0V13h6a1,1,0,0,0,0-2Z" />
+                                                            </svg>
+                                                        </a>
+
+                                                        <a href="javascript:;" class="action-btn tele"
+                                                            data-title="{{ $single->titre }}"
+                                                            data-type="{{ $single->type }}"
+                                                            data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
+                                                            data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                            data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                width="24" height="24" aria-label="Exporter">
+                                                                <path
+                                                                    d="M21,14a1,1,0,0,0-1,1v4a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V15a1,1,0,0,0-2,0v4a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V15A1,1,0,0,0,21,14Zm-9.71,1.71a1,1,0,0,0,.33.21.94.94,0,0,0,.76,0,1,1,0,0,0,.33-.21l4-4a1,1,0,0,0-1.42-1.42L13,12.59V3a1,1,0,0,0-2,0v9.59l-2.29-2.3a1,1,0,1,0-1.42,1.42Z" />
+                                                            </svg>
+                                                        </a>
+
+                                                    </div>
+
+
                                                 </div>
                                             </li>
                                             @php $i++; @endphp

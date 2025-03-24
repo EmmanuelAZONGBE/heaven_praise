@@ -12,9 +12,11 @@ class Single extends Model
         'audio',
         'statut',
         'masque',
+        'type',
         'genre_id',
         'user_id',
         'album_id',
+        'nombre_aimes',
     ];
     public function album()
     {

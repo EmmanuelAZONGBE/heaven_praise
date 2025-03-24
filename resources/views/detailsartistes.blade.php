@@ -176,7 +176,9 @@
                                                 data-title="{{ $i }}. {{ $single->titre }}"
                                                 data-artist="{{ $single->User->nomartiste }}"
                                                 data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
-                                                data-img="{{ asset('usx_files/covers/' . $single->cover) }}">
+                                                {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
+                                                data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                data-type="{{ $single->type }}">
                                                 <span class="que_img">
                                                     <img src="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                         class="mCS_img_loaded">
@@ -195,7 +197,9 @@
                                                         data-title="{{ $i }}. {{ $single->titre }}"
                                                         data-artist="{{ $single->User->nomartiste }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
-                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}">
+                                                        {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
+                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                        data-type="{{ $single->type }}">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="20"
                                                             height="20" viewBox="0 0 24 24" fill="none"
                                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -209,19 +213,22 @@
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="javascript:;" class="play-song track-click"
+                                                    <a href="javascript:;" class="play-song"
                                                         data-id="{{ $single->id }}"
                                                         data-artiste-id="{{ $artistes->id }}"
                                                         data-title="{{ $i }}. {{ $single->titre }}"
                                                         data-artist="{{ $single->User->nomartiste }}"
                                                         data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
-                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}">
+                                                        {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
+                                                        data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                        data-type="{{ $single->type }}">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="20"
                                                             height="20" viewBox="0 0 24 24" fill="none"
                                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                                             stroke-linejoin="round">
                                                             <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                                         </svg>
+
                                                     </a>
                                                 </li>
                                             </ul>
@@ -258,3 +265,30 @@
         });
     });
 </script>
+{{-- <script>
+    document.querySelectorAll('.play-song').forEach(item => {
+    item.addEventListener('click', function() {
+        const singleType = this.getAttribute('data-type'); // Récupérer le type de chanson
+        const mp3Url = this.getAttribute('data-mp3'); // URL du MP3
+        const imgUrl = this.getAttribute('data-img'); // URL de l'image de couverture
+
+        if (singleType === 'payant') {
+            // Si c'est une chanson payante, jouer 30 secondes
+            const audio = new Audio(mp3Url);
+            audio.play();
+
+            // Arrêter la musique après 30 secondes
+            setTimeout(() => {
+                audio.pause();
+                audio.currentTime = 0; // Remise à zéro de la lecture
+                alert('Pour écouter ce morceau, vous devez vous abonner.');
+            }, 30000); // 30 secondes
+
+        } else {
+            // Si c'est une chanson gratuite, jouer directement
+            const audio = new Audio(mp3Url);
+            audio.play();
+        }
+    });
+});
+</script> --}}

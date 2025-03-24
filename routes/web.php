@@ -21,10 +21,10 @@ Route::post('/ecouter-chanson', [App\Http\Controllers\GuestController::class, 'e
 Route::post('/toggle-like', [App\Http\Controllers\GuestController::class, 'toggleLike'])->name('toggleLike');
 Route::get('/checkout-login', [App\Http\Controllers\GuestController::class, 'index'])->name('checkoutloginindex');
 Route::post('/checkout-login', [App\Http\Controllers\GuestController::class, 'checkoutlogin'])->name('checkoutlogin');
-Route::get('/plan', [App\Http\Controllers\GuestController::class, 'plan'])->name('plan');
-Route::get('/details_basique', [App\Http\Controllers\GuestController::class, 'details_basique'])->name('details_basique');
-Route::get('/details_standard', [App\Http\Controllers\GuestController::class, 'details_standard'])->name('details_standard');
-Route::get('/details_premiun', [App\Http\Controllers\GuestController::class, 'details_premiun'])->name('details_premiun');
+Route::get('/forfaits', [App\Http\Controllers\GuestController::class, 'plan'])->name('plan');
+Route::get('/details_basique', [App\Http\Controllers\GuestController::class, 'detailsbasique'])->name('detailsbasique');
+Route::get('/details_standard', [App\Http\Controllers\GuestController::class, 'detailsstandard'])->name('detailsstandard');
+Route::get('/details_premiun', [App\Http\Controllers\GuestController::class, 'detailspremiun'])->name('detailspremiun');
 
 
 

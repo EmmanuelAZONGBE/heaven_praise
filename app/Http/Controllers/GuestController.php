@@ -239,10 +239,17 @@ class GuestController extends Controller
     public function detailsartistes($heavenid)
     {
         // Récupérer l'utilisateur connecté
-        $user           = Auth::user();
-        $artistes       = User::where('heavenid', $heavenid)->first();
-        $videos         = Live::where('publie', 1)->where('user_id', $artistes->id)->get();
-        $singles        = Single::orderBy('id', 'Desc')->where('user_id', $artistes->id)->where('album_id', null)->where('masque', 0)->where('statut', 'En Ligne')->get();
+        $user     = Auth::user();
+        $artistes = User::where('heavenid', $heavenid)->first();
+        $videos   = Live::where('publie', 1)->where('user_id', $artistes->id)->get();
+        $singles  = Single::orderBy('id', 'Desc')
+            ->where('user_id', $artistes->id)
+            ->where('album_id', null)
+            ->where('masque', 0)
+            ->where('statut', 'En Ligne')
+            ->with('User')
+            ->withCount('aimes')
+            ->get();
         $albums         = Album::orderBy('id', 'Desc')->where('user_id', $artistes->id)->where('masque', 0)->where('statut', 'En Ligne')->get();
         $derniersalbums = Album::orderBy('id', 'Desc')->where('user_id', $artistes->id)->where('masque', 0)->where('statut', 'En Ligne')->get()->take(6);
         // Calculer la somme des écoutes de tous les singles de cet artiste
@@ -262,33 +269,32 @@ class GuestController extends Controller
         }
 
         $singleId = $request->input('single_id');
-        $userId   = auth()->id(); // Récupère l'ID de l'utilisateur connecté
+        $userId   = auth()->id();
 
-        // Vérifier si l'utilisateur a déjà aimé cette chanson
-        $existingLike = Aime::where('user_id', $userId)
-            ->where('single_id', $singleId)
-            ->first();
-
-        if ($existingLike) {
-            // Supprimer le like existant
-            $existingLike->delete();
-            $message = "Vous n'aimez plus cette chanson.";
-        } else {
-            // Ajouter un nouveau like
-            Aime::create([
-                'user_id'   => $userId,
-                'single_id' => $singleId,
-            ]);
-            $message = "Vous avez aimé cette chanson !";
+        $single = Single::find($singleId);
+        if (! $single) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Chanson introuvable.',
+            ], 404);
         }
 
-        // Recalculer le nombre total de likes
-        $nombreAimes = Aime::where('single_id', $singleId)->count();
+        $existingLike = Aime::where('user_id', $userId)->where('single_id', $singleId)->first();
+
+        if ($existingLike) {
+            $existingLike->delete();
+            $single->decrement('nombre_aimes');
+            $message = "Vous n'aimez plus cette chanson.";
+        } else {
+            Aime::create(['user_id' => $userId, 'single_id' => $singleId]);
+            $single->increment('nombre_aimes');
+            $message = "Vous avez aimé cette chanson !";
+        }
 
         return response()->json([
             'success'      => true,
             'message'      => $message,
-            'nombre_aimes' => $nombreAimes,
+            'nombre_aimes' => $single->nombre_aimes,
         ]);
     }
 
@@ -345,19 +351,19 @@ class GuestController extends Controller
         return view('plans');
     }
 
-    public function details_basique()
+    public function detailsbasique()
     {
-        return view('details_basique');
+        return view('detailsbasique');
     }
 
-    public function details_standard()
+    public function detailsstandard()
     {
-        return view('details_standard');
+        return view('detailsstandard');
     }
 
-    public function details_premiun()
+    public function detailspremiun()
     {
-        return view('details_premiun');
+        return view('detailspremiun');
     }
 
     public function evenements()
@@ -468,8 +474,6 @@ class GuestController extends Controller
         $artistes = $album->User; // Assuming the relationship is 'User'
         return view('detailsalbums', compact('album', 'singles', 'autresalbums', 'artistes'));
     }
-
-
 
     public function checkoutlogin(Request $request)
     {
