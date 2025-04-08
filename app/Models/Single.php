@@ -17,6 +17,7 @@ class Single extends Model
         'user_id',
         'album_id',
         'nombre_aimes',
+        'is_recommended',
     ];
     public function album()
     {
@@ -43,6 +44,11 @@ class Single extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    
+    public function telechargements()
+    {
+        return $this->hasMany(Telechargement::class);
     }
 
 }

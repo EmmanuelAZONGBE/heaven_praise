@@ -38,7 +38,7 @@
                                 <div class="card"
                                     style="background-color: #d8d2d3fb; color: white; shadow-none card-lift">
                                     <div class="card-body">
-                                        <h4 class="mb-0">Total d'écoutes</h4>
+                                        <h6 class="mb-0">Total d'écoutes</h6>
                                         <h1 class="fw-bold">{{ $totalEcoutes }}</h1>
                                     </div>
                                 </div>
@@ -49,7 +49,7 @@
                                 <div class="card"
                                     style="background-color: #d8d2d3fb; color: white; shadow-none card-lift">
                                     <div class="card-body">
-                                        <h4 class="mb-0">Total Clic</h4>
+                                        <h6 class="mb-0">Total Clic</h6>
                                         <h1 class="fw-bold">{{ $totalClicks }}</h1>
                                     </div>
                                 </div>

@@ -1,9 +1,8 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -30,7 +29,7 @@ class User extends Authenticatable
         'description',
         'pays_id',
         'communaute_id',
-        'paroisse_id'
+        'paroisse_id',
     ];
 
     /**
@@ -43,7 +42,6 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-
     public function singles()
     {
         return $this->hasMany(Single::class, 'user_id', 'id');
@@ -54,12 +52,10 @@ class User extends Authenticatable
         return $this->singles()->sum('nombre_ecoutes');
     }
 
-
     public function pays()
     {
         return $this->belongsTo('App\Models\Pays');
     }
-
 
     public function likes()
     {
@@ -87,6 +83,16 @@ class User extends Authenticatable
     public function albums()
     {
         return $this->hasMany(Album::class);
+    }
+
+    public function telechargements()
+    {
+        return $this->hasMany(Telechargement::class);
+    }
+
+    public function ecoutes()
+    {
+        return $this->hasMany(Ecoute::class, 'user_id', 'id');
     }
 
 }

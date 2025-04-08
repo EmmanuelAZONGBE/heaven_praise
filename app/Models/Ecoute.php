@@ -24,9 +24,15 @@ class Ecoute extends Model
 
 
 
-    // Relation avec le modèle User (si l'écoute est associée à un utilisateur)
+    // // Relation avec le modèle User (si l'écoute est associée à un utilisateur)
+    // public function user()
+    // {
+    //     return $this->belongsTo('App\Models\Singleplaylist\User');
+    // }
+
     public function user()
-    {
-        return $this->belongsTo('App\Models\Singleplaylist\User');
-    }
+{
+    return $this->belongsTo('App\Models\User');  // Correct chemin du modèle User
+}
+
 }

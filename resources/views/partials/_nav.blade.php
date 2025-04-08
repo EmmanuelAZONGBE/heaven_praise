@@ -394,19 +394,22 @@
                                     </div>
                                 </li>
                                 <li><a href='{{ route('evenements') }}'>Évènements</a></li>
-                                {{-- <li class="menu-item-has-children"><a href="#">Pages</a>
+                                {{-- <li class="menu-item-has-children"><a href="#">Blog</a>
                                     <ul class="sub-menu">
-                                        <li><a href='/demo/404'>404</a></li>
-                                        <li><a href='/demo/author'>Author</a></li>
-                                        <li><a href='/demo/search'>Search</a></li>
-                                        <li><a href='/demo/login'>Login</a></li>
-                                        <li><a href='/demo/signup'>Signup</a></li>
+                                        <li><a href=''>Évènements Réalisés</a></li>
+                                        <li><a href=''>Évènements Passés</a></li>
                                     </ul>
                                 </li> --}}
                                 <li><a href='{{ route('artistes') }}'>Musique</a></li>
                                 <li><a href='{{ route('videos') }}'>Vidéos</a></li>
                                 <li><a href='{{ route('plan') }}'>Plan tarifaire</a></li>
-                                <li><a href='{{ route('plan') }}'>Nos studios</a></li>
+                                {{-- <li><a href='{{ route('studios') }}'>Nos studios</a></li> --}}
+                                <li class="menu-item-has-children"><a href='#'>Nos studios</a>
+                                    <ul class="sub-menu">
+                                        <li><a href='{{ route('heavenlymusic') }}'>HeavenlyPraise à Cotonou</a></li>
+                                        <li><a href='{{ route('studios') }}'>K Music - Paris</a></li>
+                                    </ul>
+                                </li>
                             </ul>
                         </nav>
                     </div>

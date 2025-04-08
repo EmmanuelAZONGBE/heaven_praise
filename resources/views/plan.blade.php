@@ -1,4 +1,4 @@
-@extends('layout.app', ['title' => "Plans d'abonnement - Écoute de chansons"])
+@extends('layout.app', ['title' => "Que toute la gloire revienne à Dieu"])
 
 @section('meta')
     <meta name="description" content="Choisissez un plan d'abonnement pour écouter vos chansons préférées sans interruption.">

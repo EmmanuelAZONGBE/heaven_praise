@@ -1,4 +1,4 @@
-@extends('layout.app', ['title' => 'Détails du Plan - Écoute de chansons'])
+@extends('layout.app', ['title' => 'Que toute la gloire revienne à Dieu'])
 
 @section('meta')
     <meta name="description"

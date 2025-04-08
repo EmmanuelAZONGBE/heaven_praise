@@ -310,12 +310,10 @@
                                     <div class="song-card">
                                         <div class="left-block">
                                             <div class="play">
-                                                <!-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}"
-                                                        data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
-                              -->
-                                                <a href="javascript:;" class="play-s1" data-id="{{ $single->id }}"
-                                                    data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}"
-                                                    data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
+                                                <a href="javascript:;" class="play-s1"
+                                                    data-id="{{ $single->id }}"
+                                                    data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
+                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                     data-title="{{ $i }}. {{ $single->titre }}"
                                                     data-type="{{ $single->type }}"
                                                     data-artist="{{ $single->User->nomartiste ?? 'Artiste inconnu' }}">
@@ -332,7 +330,7 @@
                                                     data-id="{{ $single->id }}" data-title="{{ $single->titre }}"
                                                     data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                    data-type="{{ $single->type }}" {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
+                                                    data-type="{{ $single->type }}"
                                                     data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
 
                                                     <a href="javascript:;">{{ $i }}.
@@ -353,7 +351,6 @@
                                                 data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                 data-type="{{ $single->type }}"
                                                 data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
                                                 data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
 
                                                 <span class="tooltip-pop">Ajouter à la Playlist</span>
@@ -374,7 +371,6 @@
                                             </a>
                                             <span class="like-count"
                                                 data-id="{{ $single->id }}">{{ $single->nombre_aimes ?? 0 }}</span>
-
                                         </div>
                                     </div>
                                     @php $i++; @endphp
@@ -398,8 +394,8 @@
                                     <div class="song-card">
                                         <div class="left-block">
                                             <div class="play">
-                                                <a href="javascript:;" class="play-s2" data-id="{{ $single->id }}"
-                                                    {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
+                                                <a href="javascript:;" class="play-s2"
+                                                    data-id="{{ $single->id }}"
                                                     data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                     data-title="{{ $i }}. {{ $single->titre }}"
@@ -419,7 +415,6 @@
                                                     data-type="{{ $single->type }}"
                                                     data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                     data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                    {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
                                                     data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
 
                                                     <a href="javascript:;">{{ $i }}.
@@ -438,7 +433,6 @@
                                                 data-title="{{ $single->titre }}" data-type="{{ $single->type }}"
                                                 data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                 data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
-                                                {{-- data-mp3="{{ asset('usx_files/songs/' . $single->audio) }}" --}}
                                                 data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">
 
                                                 <span class="tooltip-pop">Ajouter à la Playlist</span>

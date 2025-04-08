@@ -36,37 +36,19 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Date de Téléchargement</th>
+                                            <th>Date et l'heure de Téléchargements</th>
                                             <th>Chanson</th>
                                             <th>Artiste</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        @foreach($telechargements as $telechargement)
                                         <tr>
-                                            <td>12/03/2025</td>
-                                            <td>Chanson 1</td>
-                                            <td>Artiste 1</td>
+                                            <td>{{ $telechargement->created_at }}</td>
+                                            <td>{{ $telechargement->single->titre }}</td>
+                                            <td>{{ $telechargement->user->nomartiste }}</td>
                                         </tr>
-                                        <tr>
-                                            <td>10/03/2025</td>
-                                            <td>Chanson 2</td>
-                                            <td>Artiste 2</td>
-                                        </tr>
-                                        <tr>
-                                            <td>08/03/2025</td>
-                                            <td>Chanson 3</td>
-                                            <td>Artiste 3</td>
-                                        </tr>
-                                        <tr>
-                                            <td>05/03/2025</td>
-                                            <td>Chanson 4</td>
-                                            <td>Artiste 4</td>
-                                        </tr>
-                                        <tr>
-                                            <td>02/03/2025</td>
-                                            <td>Chanson 5</td>
-                                            <td>Artiste 5</td>
-                                        </tr>
+                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>

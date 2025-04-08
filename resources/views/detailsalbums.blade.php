@@ -124,8 +124,10 @@
                                                         </a>
 
                                                         <a href="javascript:;" class="action-btn tele"
+                                                            data-id="{{ $single->id }}"
                                                             data-title="{{ $single->titre }}"
                                                             data-type="{{ $single->type }}"
+                                                            data-user-id="{{ auth()->id() }}"
                                                             data-artist="{{ optional($single->User)->nomartiste ?? 'Artiste inconnu' }}"
                                                             data-img="{{ asset('usx_files/covers/' . $single->cover) }}"
                                                             data-mp3="https://heavenly-praise.com/usx_files/songs/{{ $single->audio }}">

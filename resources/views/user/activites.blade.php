@@ -26,10 +26,12 @@
                 @include('partials._flash-message')
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="active-tab" data-bs-toggle="tab" href="#dashboard" role="tab" aria-controls="dashboard" aria-selected="true">Mes Statistiques</a>
+                        <a class="nav-link active" id="active-tab" data-bs-toggle="tab" href="#dashboard" role="tab"
+                            aria-controls="dashboard" aria-selected="true">Mes Statistiques</a>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="link1-tab" data-bs-toggle="tab" href="#activity" role="tab" aria-controls="activity" aria-selected="false">Mes Favories</a>
+                        <a class="nav-link" id="link1-tab" data-bs-toggle="tab" href="#activity" role="tab"
+                            aria-controls="activity" aria-selected="false">Mes Favories</a>
                     </li>
                 </ul>
 
@@ -48,29 +50,17 @@
                                             <tr>
                                                 <th>Date</th>
                                                 <th>Chanson</th>
-                                                <th>Artiste</th>
                                                 <th>Nombre d'écoutes</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>01/03/2025</td>
-                                                <td>Chanson A</td>
-                                                <td>Artiste 1</td>
-                                                <td>500</td>
-                                            </tr>
-                                            <tr>
-                                                <td>15/03/2025</td>
-                                                <td>Chanson B</td>
-                                                <td>Artiste 2</td>
-                                                <td>320</td>
-                                            </tr>
-                                            <tr>
-                                                <td>01/04/2025</td>
-                                                <td>Chanson C</td>
-                                                <td>Artiste 3</td>
-                                                <td>700</td>
-                                            </tr>
+                                            @foreach ($ecoutes as $ecoute)
+                                                <tr>
+                                                    <td>{{ $ecoute->created_at->format('d-m-Y') }}</td>
+                                                    <td>{{ $ecoute->single->titre }}</td>
+                                                    <td>{{ $ecoute->nombre_ecoutes }}</td>
+                                                </tr>
+                                            @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -104,8 +94,10 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr>
-                                                            <td>{{ auth()->user()->albums ? auth()->user()->albums->sum('totalEcoutes') : 0 }}</td>
-                                                            <td>{{ auth()->user()->albums ? auth()->user()->albums->sum('totalClicks') : 0 }}</td>
+                                                            <td>{{ auth()->user()->albums ? auth()->user()->albums->sum('totalEcoutes') : 0 }}
+                                                            </td>
+                                                            <td>{{ auth()->user()->albums ? auth()->user()->albums->sum('totalClicks') : 0 }}
+                                                            </td>
                                                             <td>
                                                                 {{-- {{ auth()->user()->singles ? auth()->user()->singles->sum(fn($single) => optional($single->aimes)->count() ?? 0) : 0 }} --}}
                                                             </td>

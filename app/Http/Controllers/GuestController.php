@@ -15,9 +15,11 @@ use App\Models\Genre;
 use App\Models\Live;
 use App\Models\Livraison;
 use App\Models\Pays;
+use App\Models\Plan;
 use App\Models\Playlist;
 use App\Models\Single;
 use App\Models\Singlesplaylist;
+use App\Models\Telechargement;
 use App\Models\Ticketevenement;
 use App\Models\User;
 use Carbon\Carbon;
@@ -104,29 +106,27 @@ class GuestController extends Controller
                     ->groupBy('ecoutes.single_id')              // Pour éviter les doublons et bien compter les écoutes
                     ->selectRaw('SUM(ecoutes.nombre_ecoutes)'); // Somme des écoutes pour chaque chanson
             }, 'ecoutes_count')
-            ->leftJoin('users', 'users.heavenid', '=', 'singles.user_id') // Jointure avec la table users
+            ->leftJoin('users', 'users.heavenid', '=', 'singles.user_id')
             ->orderBy('ecoutes_count', 'desc')
-            ->take(8) // Sélectionner 8 meilleurs
+            ->take(8)
             ->get();
 
-        $recommendedSongs = DB::select("
-        SELECT * FROM `singles`
-        WHERE `is_recommended` = 1
-          AND `masque` = 0
-          AND `statut` = 'En Ligne'
-          AND NOT EXISTS (
-              SELECT * FROM `ecoutes`
-              WHERE `singles`.`id` = `ecoutes`.`single_id`
-          )
-        ORDER BY `id` DESC
-        LIMIT 8
-        ");
+        $recommendedSongs = Single::where('is_recommended', 0)
+            ->where('masque', 0)
+            ->where('statut', 'En Ligne')
+            ->doesntHave('ecoutes') // Filtrer les chansons sans écoutes
+            ->orderBy('id', 'desc')
+            ->take(8)
+            ->get();
 
         // Convertir les résultats en collection et charger les informations de l'artiste
         $recommendedSongs = collect($recommendedSongs)->map(function ($single) {
             $single->User = User::find($single->user_id); // Charger l'artiste via l'ID de l'utilisateur
             return $single;
         });
+
+        // dd($recommendedSongs);
+        // dd($topSongsThisWeek);
 
         return view('welcome', compact(
             'comingevents',
@@ -150,6 +150,50 @@ class GuestController extends Controller
             'recommendedSongs'  // Ajouter les chansons recommandées
         ));
     }
+
+    public function telestore(Request $request)
+    {
+        try {
+            // Validation des données reçues
+            $validated = $request->validate([
+                'single_id'           => 'required|exists:singles,id',
+                'user_id'             => 'required|exists:users,id',
+            ]);
+
+            // Enregistrer les données dans la base de données
+            Telechargement::create([
+                'single_id'           => $validated['single_id'],
+                'user_id'             => $validated['user_id'],
+            ]);
+
+            return response()->json(['message' => 'Téléchargement enregistré avec succès']);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Erreur lors de l\'enregistrement du téléchargement: ' . $e->getMessage());
+
+            // Return a more detailed error message
+            return response()->json(['error' => 'Erreur lors de l\'enregistrement du téléchargement', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    // public function telestore(Request $request)
+    // {
+    //     try {
+    //         // Test avec des données statiques
+    //         $validated = [
+    //             'single_id' => 1, // ID d'un single valide
+    //             'user_id' => 1,   // ID d'un utilisateur valide
+    //             'date_telechargement' => now(),
+    //         ];
+
+    //         Telechargement::create($validated);
+
+    //         return response()->json(['message' => 'Téléchargement enregistré avec succès']);
+    //     } catch (\Exception $e) {
+    //         Log::error('Erreur lors de l\'enregistrement du téléchargement: '.$e->getMessage());
+    //         return response()->json(['error' => 'Erreur lors de l\'enregistrement du téléchargement', 'message' => $e->getMessage()], 500);
+    //     }
+    // }
 
     public function addtoplaylist(Request $req)
     {
@@ -213,6 +257,41 @@ class GuestController extends Controller
     public function plan()
     {
         return view('plan');
+    }
+
+    public function music()
+    {
+        return view('kmusic');
+    }
+
+    public function heavenlym()
+    {
+        $topcats = Categorie::InRandomOrder()
+            ->whereHas(
+                'actualite',
+                function ($q) {
+                    $q->where('publie', 1);
+                }
+            )
+            ->has('evenement')
+            ->get()
+            ->take(3);
+        return view('heavenlymusic', compact('topcats'));
+    }
+
+    public function studios()
+    {
+        $topcats = Categorie::InRandomOrder()
+            ->whereHas(
+                'actualite',
+                function ($q) {
+                    $q->where('publie', 1);
+                }
+            )
+            ->has('evenement')
+            ->get()
+            ->take(3);
+        return view('studios', compact('topcats'));
     }
 
     public function artistes()
@@ -306,7 +385,7 @@ class GuestController extends Controller
 
         $validated = $request->validate([
             'single_id' => 'required|integer|exists:singles,id',
-            'action'    => 'required|string|in:click,ecoute', // Identifier si c'est un clic ou une écoute complète
+            'action'    => 'required|string|in:click,ecoute',
         ]);
 
         Log::info('Action reçue :', [

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Album;
 use App\Models\Commande;
 use App\Models\Communaute;
+use App\Models\Ecoute;
 use App\Models\Evenement;
 use App\Models\Genre;
 use App\Models\Livraison;
@@ -11,7 +12,7 @@ use App\Models\Paroisse;
 use App\Models\Pays;
 use App\Models\Playlist;
 use App\Models\Single;
-use App\Models\Ecoute;
+use App\Models\Telechargement;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,8 +36,8 @@ class UserController extends Controller
 
         // Calculer la somme des écoutes de tous ses singles
         $totalEcoutes = Ecoute::whereIn('single_id', $singles)->sum('nombre_ecoutes');
-        $totalClicks = Ecoute::whereIn('single_id', $singles)->sum('nombre_clicks');
-        return view('user.dashboard', compact( 'totalEcoutes','totalClicks'));
+        $totalClicks  = Ecoute::whereIn('single_id', $singles)->sum('nombre_clicks');
+        return view('user.dashboard', compact('totalEcoutes', 'totalClicks'));
     }
 
     public function tracks()
@@ -50,10 +51,14 @@ class UserController extends Controller
         return view('user.playlists', compact('playlists'));
     }
 
-    public function likes()
+    public function activites()
     {
-        // $user = auth()->user()->load('singles.aimes');
-        return view('user.likes');
+        $ecoutes = Ecoute::with(['single', 'user'])
+            ->orderBy('nombre_ecoutes', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('user.activites', compact('ecoutes'));
     }
 
     public function souscriptions()
@@ -63,33 +68,9 @@ class UserController extends Controller
 
     public function telechargements()
     {
-        return view('user.telechargements');
+        $telechargements = Telechargement::with('single', 'user')->paginate(10);
+        return view('user.telechargements', compact('telechargements'));
     }
-
-    // public function toggleLike(Request $request)
-    // {
-    //     $songId = $request->input('single_id');  // ID de la chanson
-    //     $user = auth()->user();  // Utilisateur authentifié
-    //     $single = Single::find($songId);  // Trouve la chanson par ID
-
-    //     if (!$single) {
-    //         return response()->json(['success' => false, 'message' => 'Chanson non trouvée']);
-    //     }
-
-    //     // Vérifie si l'utilisateur a déjà liké la chanson
-    //     if (!$single->likes->contains($user->id)) {
-    //         $single->likes()->attach($user->id);  // Ajoute un like
-    //         $single->increment('likes_count');    // Incrémente le compteur de likes
-    //         L::info("L'utilisateur {$user->id} a liké la chanson {$songId}");
-    //     } else {
-    //         Log::info("L'utilisateur {$user->id} a déjà liké la chanson {$songId}");
-    //     }
-
-    //     // Récupère le nouveau nombre de likes
-    //     $newLikeCount = $single->likes_count;
-
-    //     return response()->json(['success' => true, 'new_like_count' => $newLikeCount]);
-    // }
 
     public function parametres()
     {
@@ -198,7 +179,7 @@ class UserController extends Controller
             'genre' => 'required|string|max:255',
             //'fichier_audio' =>  'required|mimes:mp3|max:10240',
             'titre' => 'required|string|unique:singles',
-            'type' => 'required|in:gratuit,payant',
+            'type'  => 'required|in:gratuit,payant',
         ]);
 
         $time    = time();
@@ -241,8 +222,6 @@ class UserController extends Controller
     {
         return view('user.plans');
     }
-
-
 
     public function adresselivraison()
     {
@@ -313,7 +292,7 @@ class UserController extends Controller
             'slug'        => $slug,
             'description' => $req->description,
             'cover'       => $imgname,
-            'type'     => $req->type,
+            'type'        => $req->type,
             'user_id'     => Auth::user()->id,
         ]);
 
@@ -358,7 +337,7 @@ class UserController extends Controller
             'genre'         => 'required|string|max:255',
             'fichier_audio' => 'required|mimes:mp3|max:10240',
             'titre'         => 'required|string|unique:singles',
-            'type'        => 'required|in:gratuit,payant',
+            'type'          => 'required|in:gratuit,payant',
         ]);
 
         $time     = time();
@@ -373,7 +352,7 @@ class UserController extends Controller
             'genre_id' => $req->genre,
             'user_id'  => Auth::user()->id,
             'album_id' => $find->id,
-            'type'=> $req->type,
+            'type'     => $req->type,
         ]);
 
         return redirect()->back()->with('success', '<strong>Votre titre a été envoyé avec succès à l\'album ' . $find->titre . '!</strong><br>Vous serez notifié une fois qu\'il sera publié par les administrateurs.');

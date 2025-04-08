@@ -1,4 +1,4 @@
-@extends('layout.app', ['title' => 'Détails du Plan - Écoute de chansons'])
+@extends('layout.app', ['title' => 'Que toute la gloire revienne à Dieu'])
 
 @section('meta')
     <meta name="description"
@@ -141,6 +141,7 @@
             <div class="cta" style="text-align: center;">
                 <a href="#" class="btn btn-primary">Souscrire au Plan Premium</a>
             </div>
+            <br>
         </div>
     </main>
 @endsection

@@ -13,7 +13,6 @@
 Route::get('/', function () {
     return view('welcome');
 });
-Route::post('/toggle-like', [App\Http\Controllers\GuestController::class, 'toggleLike'])->name('toggleLike');
 Route::post('/clicker-cliks', [App\Http\Controllers\GuestController::class, 'clickerCliks'])->name('clickerCliks');
 Route::get('/', [App\Http\Controllers\GuestController::class, 'index'])->name('welcome');
 Route::get('/get-updated-sections', [App\Http\Controllers\GuestController::class, 'getUpdatedSections']);
@@ -22,10 +21,18 @@ Route::post('/toggle-like', [App\Http\Controllers\GuestController::class, 'toggl
 Route::get('/checkout-login', [App\Http\Controllers\GuestController::class, 'index'])->name('checkoutloginindex');
 Route::post('/checkout-login', [App\Http\Controllers\GuestController::class, 'checkoutlogin'])->name('checkoutlogin');
 Route::get('/forfaits', [App\Http\Controllers\GuestController::class, 'plan'])->name('plan');
-Route::get('/details_basique', [App\Http\Controllers\GuestController::class, 'detailsbasique'])->name('detailsbasique');
-Route::get('/details_standard', [App\Http\Controllers\GuestController::class, 'detailsstandard'])->name('detailsstandard');
+Route::get('/services/studios', [App\Http\Controllers\GuestController::class, 'studios'])->name('studios');
+Route::get('/studios/{slug}', [App\Http\Controllers\GuestController::class, 'show'])->name('studio.details');
+// Route::get('/details_basique', [App\Http\Controllers\GuestController::class, 'detailsbasique'])->name('detailsbasique');
+// Route::get('/details_standard', [App\Http\Controllers\GuestController::class, 'detailsstandard'])->name('detailsstandard');
 Route::get('/details_premiun', [App\Http\Controllers\GuestController::class, 'detailspremiun'])->name('detailspremiun');
 
+Route::get('/offres/basique', [App\Http\Controllers\GuestController::class, 'detailsbasique'])->name('detailsbasique');
+Route::get('/offres/standard', [App\Http\Controllers\GuestController::class, 'detailsstandard'])->name('detailsstandard');
+// Route::get('/offres/premium', [App\Http\Controllers\GuestController::class, 'detailspremium'])->name('detailspremiun');
+Route::get('/service/intrumantale', [App\Http\Controllers\GuestController::class, 'music'])->name('kmusic');
+Route::get('/offre/intrumantale', [App\Http\Controllers\GuestController::class, 'heavenlym'])->name('heavenlymusic');
+Route::post('/telechargement', [App\Http\Controllers\GuestController::class, 'telestore']);
 
 
 Route::post('/addtoplaylist', [App\Http\Controllers\GuestController::class, 'addtoplaylist'])->name('addtoplaylist');
@@ -79,11 +86,12 @@ Route::group(['prefix' => 'tabeau-de-bord/'], function () {
 
     Route::get('/playlists', [App\Http\Controllers\UserController::class, 'playlists'])->name('user.playlists');
 
-    Route::get('/likes', [App\Http\Controllers\UserController::class, 'likes'])->name('user.likes');
+    Route::get('/activites', [App\Http\Controllers\UserController::class, 'activites'])->name('user.activites');
 
     Route::get('/souscriptions', [App\Http\Controllers\UserController::class, 'souscriptions'])->name('user.souscriptions');
 
     Route::get('/telechargements', [App\Http\Controllers\UserController::class, 'telechargements'])->name('user.telechargements');
+
 
     Route::get('/parametres', [App\Http\Controllers\UserController::class, 'parametres'])->name('user.parametres');
 
